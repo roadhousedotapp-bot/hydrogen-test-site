@@ -1,13 +1,6 @@
-import {
-  Await,
-  Form,
-  Outlet,
-  useLoaderData,
-  useMatches,
-  useOutlet,
-} from '@remix-run/react';
+import { Await, Form, Outlet, useLoaderData, useMatches, useOutlet } from 'react-router';
 import {Suspense} from 'react';
-import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import {data, type LoaderFunctionArgs} from 'react-router';
 import {flattenConnection} from '@shopify/hydrogen';
 
 import type {
@@ -35,18 +28,18 @@ import {
 export const headers = routeHeaders;
 
 export async function loader({request, context, params}: LoaderFunctionArgs) {
-  const {data, errors} = await context.customerAccount.query(
+  const {data: customerData, errors} = await context.customerAccount.query(
     CUSTOMER_DETAILS_QUERY,
   );
 
   /**
    * If the customer failed to load, we assume their access token is invalid.
    */
-  if (errors?.length || !data?.customer) {
+  if (errors?.length || !customerData?.customer) {
     throw await doLogout(context);
   }
 
-  const customer = data?.customer;
+  const customer = customerData?.customer;
 
   const heading = customer
     ? customer.firstName
@@ -54,7 +47,7 @@ export async function loader({request, context, params}: LoaderFunctionArgs) {
       : `Welcome to your account.`
     : 'Account Details';
 
-  return defer(
+  return data(
     {
       customer,
       heading,

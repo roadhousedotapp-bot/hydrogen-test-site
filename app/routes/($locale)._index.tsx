@@ -1,10 +1,9 @@
 import {
-  defer,
   type MetaArgs,
   type LoaderFunctionArgs,
-} from '@shopify/remix-oxygen';
+} from 'react-router';
 import {Suspense} from 'react';
-import {Await, useLoaderData} from '@remix-run/react';
+import { Await, useLoaderData } from 'react-router';
 import {getSeoMeta} from '@shopify/hydrogen';
 
 import {Hero} from '~/components/Hero';
@@ -36,7 +35,7 @@ export async function loader(args: LoaderFunctionArgs) {
   // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
 
-  return defer({...deferredData, ...criticalData});
+  return {...deferredData, ...criticalData};
 }
 
 /**
@@ -138,7 +137,7 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 }
 
 export const meta = ({matches}: MetaArgs<typeof loader>) => {
-  return getSeoMeta(...matches.map((match) => (match.data as any).seo));
+  return getSeoMeta(...matches.map((match) => (match.data as any).seo)) ?? [];
 };
 
 export default function Homepage() {

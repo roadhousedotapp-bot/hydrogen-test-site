@@ -1,9 +1,8 @@
 import {
-  json,
   type MetaArgs,
   type LoaderFunctionArgs,
-} from '@shopify/remix-oxygen';
-import {useLoaderData} from '@remix-run/react';
+} from 'react-router';
+import { useLoaderData } from 'react-router';
 import type {Collection} from '@shopify/hydrogen/storefront-api-types';
 import {
   Image,
@@ -42,7 +41,7 @@ export const loader = async ({
     url: request.url,
   });
 
-  return json({collections, seo});
+  return {collections, seo};
 };
 
 export const meta = ({matches}: MetaArgs<typeof loader>) => {
