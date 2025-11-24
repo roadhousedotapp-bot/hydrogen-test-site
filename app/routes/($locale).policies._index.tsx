@@ -1,9 +1,8 @@
 import {
-  json,
   type MetaArgs,
   type LoaderFunctionArgs,
-} from '@shopify/remix-oxygen';
-import {useLoaderData} from '@remix-run/react';
+} from 'react-router';
+import { useLoaderData } from 'react-router';
 import invariant from 'tiny-invariant';
 import {getSeoMeta} from '@shopify/hydrogen';
 
@@ -32,10 +31,10 @@ export async function loader({
 
   const seo = seoPayload.policies({policies, url: request.url});
 
-  return json({
+  return {
     policies,
     seo,
-  });
+  };
 }
 
 export const meta = ({matches}: MetaArgs<typeof loader>) => {

@@ -1,4 +1,4 @@
-import {useLocation, useRouteLoaderData} from '@remix-run/react';
+import {useLocation, useRouteLoaderData} from 'react-router';
 import type {MoneyV2} from '@shopify/hydrogen/storefront-api-types';
 import type {FulfillmentStatus} from '@shopify/hydrogen/customer-account-api-types';
 import typographicBase from 'typographic-base';
@@ -8,7 +8,6 @@ import type {
   MenuFragment,
   ParentMenuItemFragment,
 } from 'storefrontapi.generated';
-import type {RootLoader} from '~/root';
 import {countries} from '~/data/countries';
 
 import type {I18nLocale} from './type';
@@ -29,6 +28,10 @@ export type ParentEnhancedMenuItem = (ParentMenuItemFragment &
 
 export type EnhancedMenu = Pick<MenuFragment, 'id'> & {
   items: ParentEnhancedMenuItem[];
+};
+
+type MenuEnv = {
+  PUBLIC_STORE_DOMAIN?: string;
 };
 
 export function missingClass(string?: string, prefix?: string) {
@@ -146,7 +149,7 @@ function resolveToFromType(
 /*
   Parse each menu link and adding, isExternal, to and target
 */
-function parseItem(primaryDomain: string, env: Env, customPrefixes = {}) {
+function parseItem(primaryDomain: string, env: MenuEnv, customPrefixes = {}) {
   return function (
     item:
       | MenuFragment['items'][number]
@@ -204,7 +207,7 @@ function parseItem(primaryDomain: string, env: Env, customPrefixes = {}) {
 export function parseMenu(
   menu: MenuFragment,
   primaryDomain: string,
-  env: Env,
+  env: MenuEnv,
   customPrefixes = {},
 ): EnhancedMenu | null {
   if (!menu?.items) {
@@ -270,7 +273,7 @@ export function getLocaleFromRequest(request: Request): I18nLocale {
 }
 
 export function usePrefixPathWithLocale(path: string) {
-  const rootData = useRouteLoaderData<RootLoader>('root');
+  const rootData = useRouteLoaderData<{selectedLocale?: I18nLocale}>('root');
   const selectedLocale = rootData?.selectedLocale ?? DEFAULT_LOCALE;
 
   return `${selectedLocale.pathPrefix}${
@@ -280,7 +283,7 @@ export function usePrefixPathWithLocale(path: string) {
 
 export function useIsHomePath() {
   const {pathname} = useLocation();
-  const rootData = useRouteLoaderData<RootLoader>('root');
+  const rootData = useRouteLoaderData<{selectedLocale?: I18nLocale}>('root');
   const selectedLocale = rootData?.selectedLocale ?? DEFAULT_LOCALE;
   const strippedPathname = pathname.replace(selectedLocale.pathPrefix, '');
   return strippedPathname === '/';
