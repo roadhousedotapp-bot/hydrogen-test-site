@@ -10,6 +10,7 @@ import {Heading, Text} from '~/components/Text';
 import {ProductCard} from '~/components/ProductCard';
 import {Skeleton} from '~/components/Skeleton';
 import {usePrefixPathWithLocale} from '~/lib/utils';
+import {Button} from '~/components/Button';
 
 interface FeaturedProductsProps {
   count: number;
@@ -73,6 +74,11 @@ export function FeaturedProducts({
           onClick={onClose}
           products={data?.products}
         />
+      </div>
+      <div className="text-center">
+        <Button to="/products" variant="primary" className="bg-red-500">
+          See all products
+        </Button>
       </div>
     </>
   );
