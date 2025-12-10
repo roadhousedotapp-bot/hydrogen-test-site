@@ -12,6 +12,19 @@ export default async function handleRequest(
   context: AppLoadContext,
 ) {
   const {nonce, header, NonceProvider} = createContentSecurityPolicy({
+    +    /* @description Add Google Tag Manager domains to Content Security Policy */
++    imgSrc: [
++      "'self'",
++      'https://cdn.shopify.com',
++      'https://*.google-analytics.com',
++      'https://*.googletagmanager.com',
++    ],
++    connectSrc: [
++      "'self'",
++      'https://*.google-analytics.com',
++      'https://*.analytics.google.com',
++      'https://*.googletagmanager.com',
++    ],
     shop: {
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
       storeDomain: context.env.PUBLIC_STORE_DOMAIN,
@@ -20,8 +33,8 @@ export default async function handleRequest(
       'self',
       'https://cdn.shopify.com',
       'https://shopify.com',
-      'https://www.google-analytics.com',
-      'https://www.googletagmanager.com',
+      'https://*.google-analytics.com',
+      'https://*.googletagmanager.com',
       ...(process.env.NODE_ENV !== 'production' ? ['http://localhost:*'] : []),
     ],
   });
