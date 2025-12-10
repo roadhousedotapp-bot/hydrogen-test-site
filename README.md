@@ -58,6 +58,8 @@ npm run dev
 1. Edit `Logout URI` to include your public domain `https://<your-ngrok-domain>.app` or keep it blank
 
 
+### Google Tag Manager information
+
 @@ -1,6 +1,6 @@
 -# Hydrogen template: Skeleton
 +# Hydrogen template: Google Tag Manager (GTM)
