@@ -74,6 +74,16 @@ export function FeaturedProducts({
           products={data?.products}
         />
       </div>
+      {layout === 'page' && (
+        <div className="w-full mt-10 flex justify-center">
+          <a
+            href="/products"
+            className="inline-block rounded-md border border-transparent bg-red-600 px-8 py-3 text-center font-medium text-white hover:bg-red-700"
+          >
+            See all products
+          </a>
+        </div>
+      )}
     </>
   );
 }
