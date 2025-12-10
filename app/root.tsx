@@ -307,7 +307,7 @@ async function getLayoutData({storefront, env}: AppLoadContext) {
       footerMenuHandle: 'footer',
       language: storefront.i18n.language,
     },
-  };
+  });
 
   invariant(data, 'No data returned from Shopify API');
 
