@@ -36,6 +36,7 @@ Remember to update `.env` with your shop's domain and Storefront API token!
 npm run build
 ```
 
+
 ## Local development
 
 ```bash
