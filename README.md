@@ -122,6 +122,7 @@ npm create @shopify/hydrogen@latest
   +});
   +```
 - ## Building for production
+
   ```bash
   @@ -42,4 +91,4 @@ npm run dev
 
