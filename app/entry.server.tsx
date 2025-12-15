@@ -12,7 +12,7 @@ export default async function handleRequest(
   context: AppLoadContext,
 ) {
   const {nonce, header, NonceProvider} = createContentSecurityPolicy({
-        /* @description Add Google Tag Manager domains to Content Security Policy */
+    /* @description Add Google Tag Manager domains to Content Security Policy */
     imgSrc: [
       "'self'",
       'https://cdn.shopify.com',
