@@ -25,13 +25,16 @@ import {
   type SeoConfig,
 } from '@shopify/hydrogen';
 import invariant from 'tiny-invariant';
+
 import {PageLayout} from '~/components/PageLayout';
 import {GenericError} from '~/components/GenericError';
 import {NotFound} from '~/components/NotFound';
-import favicon from '~/assets/favicon.svg';
-import {seoPayload} from '~/lib/seo.server';
-import styles from '~/styles/app.css?url';
 import {GoogleTagManager} from '~/components/GoogleTagManager';
+import {seoPayload} from '~/lib/seo.server';
+
+import favicon from '~/assets/favicon.svg';
+import styles from '~/styles/app.css?url';
+
 import {DEFAULT_LOCALE, parseMenu} from './lib/utils';
 
 export type RootLoader = typeof loader;
