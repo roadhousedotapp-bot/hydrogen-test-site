@@ -32,7 +32,6 @@ import {NotFound} from '~/components/NotFound';
 import favicon from '~/assets/favicon.svg';
 import {seoPayload} from '~/lib/seo.server';
 import styles from '~/styles/app.css?url';
-
 import {GoogleTagManager} from '~/components/GoogleTagManager';
 
 import {DEFAULT_LOCALE, parseMenu} from './lib/utils';
@@ -156,20 +155,20 @@ function Layout({children}: {children?: React.ReactNode}) {
         <link rel="stylesheet" href={styles}></link>
         <Meta />
         <Links />
-         {/* @description Add Google Tag Manager script to head */}
+        {/* @description Add Google Tag Manager script to head */}
         <Script
-  nonce={nonce}
-  dangerouslySetInnerHTML={{
-    __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          nonce={nonce}
+          dangerouslySetInnerHTML={{
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-5P9R6MP8');`,
-  }}
-/>
+          }}
+        />
       </head>
       <body>
-       {/* @description Add Google Tag Manager noscript iframe for users without JavaScript */}
+        {/* @description Add Google Tag Manager noscript iframe for users without JavaScript */}
         <noscript>
           <iframe
             title="Google Tag Manager"
