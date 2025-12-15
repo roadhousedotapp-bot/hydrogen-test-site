@@ -25,16 +25,13 @@ import {
   type SeoConfig,
 } from '@shopify/hydrogen';
 import invariant from 'tiny-invariant';
-
 import {PageLayout} from '~/components/PageLayout';
 import {GenericError} from '~/components/GenericError';
 import {NotFound} from '~/components/NotFound';
 import favicon from '~/assets/favicon.svg';
 import {seoPayload} from '~/lib/seo.server';
 import styles from '~/styles/app.css?url';
-
 import {GoogleTagManager} from '~/components/GoogleTagManager';
-
 import {DEFAULT_LOCALE, parseMenu} from './lib/utils';
 
 export type RootLoader = typeof loader;
@@ -157,7 +154,7 @@ function Layout({children}: {children?: React.ReactNode}) {
         <Meta />
         <Links />
          {/* @description Add Google Tag Manager script to head */}
-        <Script
+        <Script>
   nonce={nonce}
   dangerouslySetInnerHTML={{
     __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -166,7 +163,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-5P9R6MP8');`,
   }}
-/>
+</Script>
       </head>
       <body>
        {/* @description Add Google Tag Manager noscript iframe for users without JavaScript */}
