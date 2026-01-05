@@ -3,6 +3,7 @@ import {RemixServer} from '@remix-run/react';
 import isbot from 'isbot';
 import {renderToReadableStream} from 'react-dom/server';
 import {createContentSecurityPolicy} from '@shopify/hydrogen';
+import React from 'react';
 
 export default async function handleRequest(
   request: Request,
@@ -21,31 +22,36 @@ export default async function handleRequest(
     "https://cdn.shopify.com",
     "https://www.googletagmanager.com",
     "https://www.google-analytics.com",
-  ],
+  ] as const,
   imgSrc: [
     "'self'",
     "https://cdn.shopify.com",
     "https://www.google-analytics.com",
-  ],
+  ] as const,
   connectSrc: [
     "'self'",
     "https://www.google-analytics.com",
-  ],
+  ] as const,
 });
 
   const body = await renderToReadableStream(
-    <NonceProvider>
-      <RemixServer context={remixContext} url={request.url} />
-    </NonceProvider>,
-    {
-      nonce,
-      signal: request.signal,
-      onError(error) {
-        console.error(error);
-        responseStatusCode = 500;
-      },
+  React.createElement(
+    NonceProvider,
+    null,
+    React.createElement(RemixServer, {
+      context: remixContext,
+      url: request.url,
+    }),
+  ),
+  {
+    nonce,
+    signal: request.signal,
+    onError(error) {
+      console.error(error);
+      responseStatusCode = 500;
     },
-  );
+  },
+);
 
   if (isbot(request.headers.get('user-agent'))) {
     await body.allReady;
