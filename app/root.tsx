@@ -18,6 +18,7 @@ import {
 } from '@remix-run/react';
 import {
   useNonce,
+  Script,
   Analytics,
   getShopAnalytics,
   getSeoMeta,
@@ -28,11 +29,11 @@ import invariant from 'tiny-invariant';
 import {PageLayout} from '~/components/PageLayout';
 import {GenericError} from '~/components/GenericError';
 import {NotFound} from '~/components/NotFound';
-import favicon from '~/assets/favicon.svg';
-import {seoPayload} from '~/lib/seo.server';
-import styles from '~/styles/app.css?url';
-
 import {GoogleTagManager} from '~/components/GoogleTagManager';
+import {seoPayload} from '~/lib/seo.server';
+
+import favicon from '~/assets/favicon.svg';
+import styles from '~/styles/app.css?url';
 
 import {DEFAULT_LOCALE, parseMenu} from './lib/utils';
 
@@ -199,7 +200,9 @@ function Layout({children}: {children?: React.ReactNode}) {
           children
         )}
         <ScrollRestoration nonce={nonce} />
-        <Scripts nonce={nonce} />
+        <Scripts 
+          nonce={nonce} 
+          />
       </body>
     </html>
   );
