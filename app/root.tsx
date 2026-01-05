@@ -5,6 +5,7 @@ import {
   type AppLoadContext,
   type MetaArgs,
 } from '@shopify/remix-oxygen';
+
 import {
   isRouteErrorResponse,
   Links,
@@ -16,6 +17,7 @@ import {
   useRouteError,
   type ShouldRevalidateFunction,
 } from '@remix-run/react';
+
 import {
   useNonce,
   Script,
@@ -24,14 +26,17 @@ import {
   getSeoMeta,
   type SeoConfig,
 } from '@shopify/hydrogen';
+
 import invariant from 'tiny-invariant';
+
 import {PageLayout} from '~/components/PageLayout';
 import {GenericError} from '~/components/GenericError';
 import {NotFound} from '~/components/NotFound';
 import {GoogleTagManager} from '~/components/GoogleTagManager';
-import {seoPayload} from '~/lib/seo.server';
+
 import favicon from '~/assets/favicon.svg';
 import styles from '~/styles/app.css?url';
+import {seoPayload} from '~/lib/seo.server';
 import {DEFAULT_LOCALE, parseMenu} from './lib/utils';
 
 export type RootLoader = typeof loader;
@@ -154,8 +159,7 @@ function Layout({children}: {children?: React.ReactNode}) {
         <Meta />
         <Links />
         {/* @description Add Google Tag Manager script to head */}
-        <Script
-          nonce={nonce}
+        <Script nonce={nonce}>
           dangerouslySetInnerHTML={{
             __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
