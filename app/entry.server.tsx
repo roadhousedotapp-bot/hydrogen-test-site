@@ -3,7 +3,6 @@ import {RemixServer} from '@remix-run/react';
 import isbot from 'isbot';
 import {renderToReadableStream} from 'react-dom/server';
 import {createContentSecurityPolicy} from '@shopify/hydrogen';
-import React from 'react';
 
 export default async function handleRequest(
   request: Request,
@@ -35,14 +34,9 @@ export default async function handleRequest(
 });
 
   const body = await renderToReadableStream(
-  React.createElement(
-    NonceProvider,
-    null,
-    React.createElement(RemixServer, {
-      context: remixContext,
-      url: request.url,
-    }),
-  ),
+  <NonceProvider>
+    <RemixServer context={remixContext} url={request.url} />
+  </NonceProvider>,
   {
     nonce,
     signal: request.signal,
@@ -50,7 +44,7 @@ export default async function handleRequest(
       console.error(error);
       responseStatusCode = 500;
     },
-  },
+  }
 );
 
   if (isbot(request.headers.get('user-agent'))) {
