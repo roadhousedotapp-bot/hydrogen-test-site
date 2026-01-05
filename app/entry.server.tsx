@@ -12,26 +12,26 @@ export default async function handleRequest(
   context: AppLoadContext,
 ) {
   const {nonce, header, NonceProvider} = createContentSecurityPolicy({
-    shop: {
-      checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
-      storeDomain: context.env.PUBLIC_STORE_DOMAIN,
-    },
-    scriptSrc: [
-      "'self'",
-      'https://cdn.shopify.com',
-      'https://www.googletagmanager.com',
-      'https://www.google-analytics.com',
-    ],
-    imgSrc: [
-      "'self'",
-      'https://cdn.shopify.com',
-      'https://www.google-analytics.com',
-    ],
-    connectSrc: [
-      "'self'",
-      'https://www.google-analytics.com',
-    ],
-  });
+  shop: {
+    checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
+    storeDomain: context.env.PUBLIC_STORE_DOMAIN,
+  },
+  scriptSrc: [
+    "'self'",
+    "https://cdn.shopify.com",
+    "https://www.googletagmanager.com",
+    "https://www.google-analytics.com",
+  ],
+  imgSrc: [
+    "'self'",
+    "https://cdn.shopify.com",
+    "https://www.google-analytics.com",
+  ],
+  connectSrc: [
+    "'self'",
+    "https://www.google-analytics.com",
+  ],
+});
 
   const body = await renderToReadableStream(
     <NonceProvider>
