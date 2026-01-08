@@ -19,18 +19,16 @@ export const links: LinksFunction = () => [
 export default function App() {
   return (
     <html lang="en">
-      <head>
-        <Meta />
-        <Links />
-
-        {/* Google Tag Manager */}
-        <GoogleTagManager gtmId={ENV.PUBLIC_GTM_ID} />
-      </head>
-      <body>
-        <Outlet />
-        <ScrollRestoration />
-        <Scripts />
-      </body>
+<head>
+  <Meta />
+  <Links />
+</head>
+<body>
+  <GoogleTagManager gtmId={ENV.PUBLIC_GTM_ID} />
+  <Outlet />
+  <ScrollRestoration />
+  <Scripts />
+</body>
     </html>
   );
 }
