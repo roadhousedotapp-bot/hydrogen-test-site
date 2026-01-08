@@ -17,7 +17,7 @@ export const links: LinksFunction = () => [{rel: 'stylesheet', href: styles}];
 export default function App() {
   const {data} = useLoaderData<typeof loader>();
   const {ENV} = data;
-  
+
   return (
     <html lang="en">
       <head>
