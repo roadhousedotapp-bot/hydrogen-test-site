@@ -12,41 +12,38 @@ export default async function handleRequest(
   context: AppLoadContext,
 ) {
   const {nonce, header, NonceProvider} = createContentSecurityPolicy({
-  shop: {
-    checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
-    storeDomain: context.env.PUBLIC_STORE_DOMAIN,
-  },
-  scriptSrc: [
-    "'self'",
-    "https://cdn.shopify.com",
-    "https://www.googletagmanager.com",
-    "https://www.google-analytics.com",
-  ] as const,
-  imgSrc: [
-    "'self'",
-    "https://cdn.shopify.com",
-    "https://www.google-analytics.com",
-  ] as const,
-  connectSrc: [
-    "'self'",
-    "https://www.google-analytics.com",
-  ] as const,
-});
+    shop: {
+      checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
+      storeDomain: context.env.PUBLIC_STORE_DOMAIN,
+    },
+    scriptSrc: [
+      "'self'",
+      'https://cdn.shopify.com',
+      'https://www.googletagmanager.com',
+      'https://www.google-analytics.com',
+    ] as const,
+    imgSrc: [
+      "'self'",
+      'https://cdn.shopify.com',
+      'https://www.google-analytics.com',
+    ] as const,
+    connectSrc: ["'self'", 'https://www.google-analytics.com'] as const,
+  });
 
   const body = await renderToReadableStream(
-  <NonceProvider>
-    <RemixServer context={remixContext} url={request.url} />
-  </NonceProvider>,
-  {
-    nonce,
-    signal: request.signal,
-    onError(error) {
-      // eslint-disable-next-line no-console
-      console.error(error);
-      responseStatusCode = 500;
+    <NonceProvider>
+      <RemixServer context={remixContext} url={request.url} />
+    </NonceProvider>,
+    {
+      nonce,
+      signal: request.signal,
+      onError(error) {
+        // eslint-disable-next-line no-console
+        console.error(error);
+        responseStatusCode = 500;
+      },
     },
-  }
-);
+  );
 
   if (isbot(request.headers.get('user-agent'))) {
     await body.allReady;

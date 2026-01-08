@@ -7,28 +7,26 @@ import {
   isRouteErrorResponse,
   useRouteError,
 } from '@remix-run/react';
-import type { LinksFunction } from '@shopify/remix-oxygen';
+import type {LinksFunction} from '@shopify/remix-oxygen';
 
 import styles from '~/styles/app.css?url';
-import { GoogleTagManager } from '~/components/GoogleTagManager';
+import {GoogleTagManager} from '~/components/GoogleTagManager';
 
-export const links: LinksFunction = () => [
-  { rel: 'stylesheet', href: styles },
-];
+export const links: LinksFunction = () => [{rel: 'stylesheet', href: styles}];
 
 export default function App() {
   return (
     <html lang="en">
-<head>
-  <Meta />
-  <Links />
-</head>
-<body>
-  <GoogleTagManager gtmId={ENV.PUBLIC_GTM_ID} />
-  <Outlet />
-  <ScrollRestoration />
-  <Scripts />
-</body>
+      <head>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <GoogleTagManager gtmId={ENV.PUBLIC_GTM_ID} />
+        <Outlet />
+        <ScrollRestoration />
+        <Scripts />
+      </body>
     </html>
   );
 }

@@ -2,7 +2,7 @@ type Props = {
   gtmId?: string;
 };
 
-export function GoogleTagManager({ gtmId }: Props) {
+export function GoogleTagManager({gtmId}: Props) {
   if (!gtmId) return null;
 
   return (
