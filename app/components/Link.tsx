@@ -6,7 +6,7 @@ import {
   useRouteLoaderData,
 } from '@remix-run/react';
 
-import type {RootLoader} from '~/root';
+import type {loader as RootLoader} from '~/root';
 
 type LinkProps = Omit<RemixLinkProps, 'className'> & {
   className?: RemixNavLinkProps['className'] | RemixLinkProps['className'];
