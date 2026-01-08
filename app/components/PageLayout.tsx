@@ -27,7 +27,7 @@ import {
 } from '~/lib/utils';
 import {useIsHydrated} from '~/hooks/useIsHydrated';
 import {useCartFetchers} from '~/hooks/useCartFetchers';
-import type {RootLoader} from '~/root';
+import type {loader as RootLoader} from '~/root';
 
 type LayoutProps = {
   children: React.ReactNode;
