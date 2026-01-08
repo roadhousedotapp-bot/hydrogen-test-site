@@ -36,7 +36,7 @@ export function ErrorBoundary() {
 
   if (isRouteErrorResponse(error)) {
     return (
-      <html>
+      <html lang="en">
         <head>
           <Meta />
           <Links />
@@ -51,7 +51,7 @@ export function ErrorBoundary() {
   }
 
   return (
-    <html>
+    <html lang="en">
       <head>
         <Meta />
         <Links />
