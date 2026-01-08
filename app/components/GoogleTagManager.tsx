@@ -1,24 +1,24 @@
-import {useAnalytics} from '@shopify/hydrogen';
-import {useEffect} from 'react';
+type Props = {
+  gtmId?: string;
+};
 
-declare global {
-  interface Window {
-    dataLayer: any[];
-  }
-}
+export function GoogleTagManager({ gtmId }: Props) {
+  if (!gtmId) return null;
 
-export function GoogleTagManager() {
-  const {subscribe, register} = useAnalytics();
-  const {ready} = register('Google Tag Manager');
-
-  useEffect(() => {
-    subscribe('product_viewed', () => {
-      // Triggering a custom event in GTM for when a product is viewed
-      window.dataLayer.push({event: 'viewed-product'});
-    });
-
-    ready();
-  }, [ready, subscribe]);
-
-  return null;
+  return (
+    <script
+      dangerouslySetInnerHTML={{
+        __html: `
+          (function(w,d,s,l,i){w[l]=w[l]||[];
+          w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+          var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+          j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;
+          f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','${gtmId}');
+        `,
+      }}
+    />
+  );
 }
