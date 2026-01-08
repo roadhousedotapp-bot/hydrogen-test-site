@@ -6,6 +6,7 @@ export function GoogleTagManager({ gtmId }: Props) {
   if (!gtmId) return null;
 
   return (
+    // eslint-disable-next-line react/no-danger
     <script
       dangerouslySetInnerHTML={{
         __html: `
