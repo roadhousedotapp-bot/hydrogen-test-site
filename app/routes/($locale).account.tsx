@@ -85,10 +85,10 @@ export default function Authenticated() {
           <Modal cancelLink="/account">
             <Outlet context={{customer: data.customer}} />
           </Modal>
-          <Account 
-            customer={data.customer} 
-            heading={data.heading} 
-            featuredDataPromise={data.featuredDataPromise} 
+          <Account
+            customer={data.customer}
+            heading={data.heading}
+            featuredDataPromise={data.featuredDataPromise}
           />
         </>
       );
@@ -98,10 +98,10 @@ export default function Authenticated() {
   }
 
   return (
-    <Account 
-      customer={data.customer} 
-      heading={data.heading} 
-      featuredDataPromise={data.featuredDataPromise} 
+    <Account
+      customer={data.customer}
+      heading={data.heading}
+      featuredDataPromise={data.featuredDataPromise}
     />
   );
 }
