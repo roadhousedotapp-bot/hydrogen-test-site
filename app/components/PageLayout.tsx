@@ -4,6 +4,7 @@ import {Disclosure} from '@headlessui/react';
 import {Suspense, useEffect, useMemo} from 'react';
 import {CartForm} from '@shopify/hydrogen';
 
+// This import will now work once you run codegen after pasting this file
 import type {LayoutQuery} from 'storefrontapi.generated';
 import {Text, Heading, Section} from '~/components/Text';
 import {Link} from '~/components/Link';
@@ -78,7 +79,6 @@ function Header({title, menu}: {title: string; menu?: EnhancedMenu}) {
 
   const addToCartFetchers = useCartFetchers(CartForm.ACTIONS.LinesAdd);
 
-  // toggle cart drawer when adding to cart
   useEffect(() => {
     if (isCartOpen || !addToCartFetchers.length) return;
     openCart();
@@ -114,8 +114,10 @@ function CartDrawer({isOpen, onClose}: {isOpen: boolean; onClose: () => void}) {
     <Drawer open={isOpen} onClose={onClose} heading="Cart" openFrom="right">
       <div className="grid">
         <Suspense fallback={<CartLoading />}>
-          <Await resolve={rootData?.cart}>
-            {(cart: any) => <Cart layout="drawer" onClose={onClose} cart={cart} />}
+          <Await resolve={rootData.cart}>
+            {(cart) => {
+              return <Cart layout="drawer" onClose={onClose} cart={cart as any} />;
+            }}
           </Await>
         </Suspense>
       </div>
@@ -150,7 +152,6 @@ function MenuMobileNav({
 }) {
   return (
     <nav className="grid gap-4 p-6 sm:gap-6 sm:px-12 sm:py-8">
-      {/* Top level menu items */}
       {(menu?.items || []).map((item) => (
         <span key={item.id} className="block">
           <Link
@@ -182,8 +183,6 @@ function MobileHeader({
   openCart: () => void;
   openMenu: () => void;
 }) {
-  // useHeaderStyleFix(containerStyle, setContainerStyle, isHome);
-
   const params = useParams();
 
   return (
@@ -276,7 +275,6 @@ function DesktopHeader({
           {title}
         </Link>
         <nav className="flex gap-8">
-          {/* Top level menu items */}
           {(menu?.items || []).map((item) => (
             <Link
               key={item.id}
@@ -350,7 +348,7 @@ function CartCount({
 
   return (
     <Suspense fallback={<Badge count={0} dark={isHome} openCart={openCart} />}>
-      <Await resolve={rootData?.cart}>
+      <Await resolve={rootData.cart}>
         {(cart: any) => (
           <Badge
             dark={isHome}
@@ -501,3 +499,47 @@ function FooterMenu({menu}: {menu?: EnhancedMenu}) {
     </>
   );
 }
+
+/**
+ * THIS IS THE MISSING PIECE.
+ * Adding the #graphql tag ensures codegen exports 'LayoutQuery'
+ */
+const LAYOUT_QUERY = `#graphql
+  query Layout(
+    $headerMenuHandle: String!
+    $footerMenuHandle: String!
+    $language: LanguageCode
+    $country: CountryCode
+  ) @inContext(language: $language, country: $country) {
+    shop {
+      name
+      description
+    }
+    headerMenu: menu(handle: $headerMenuHandle) {
+      id
+      items {
+        ...MenuItem
+        items {
+          ...MenuItem
+        }
+      }
+    }
+    footerMenu: menu(handle: $footerMenuHandle) {
+      id
+      items {
+        ...MenuItem
+        items {
+          ...MenuItem
+        }
+      }
+    }
+  }
+  fragment MenuItem on MenuItem {
+    id
+    resourceId
+    tags
+    title
+    type
+    url
+  }
+`;
