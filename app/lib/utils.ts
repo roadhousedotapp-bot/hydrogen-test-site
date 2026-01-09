@@ -313,3 +313,11 @@ export function isLocalPath(url: string) {
 
   return false;
 }
+
+export function parseSync(data: any) {
+  try {
+    return JSON.parse(JSON.stringify(data));
+  } catch {
+    return data;
+  }
+}
