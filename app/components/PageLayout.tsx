@@ -116,7 +116,7 @@ function CartDrawer({isOpen, onClose}: {isOpen: boolean; onClose: () => void}) {
         <Suspense fallback={<CartLoading />}>
           <Await resolve={rootData.cart}>
             {(cart) => {
-              return <Cart layout="drawer" onClose={onClose} cart={cart as any} />;
+              return <Cart·layout="drawer"·onClose={onClose}·cart={cart·as·any}·/>;
             }}
           </Await>
         </Suspense>
