@@ -8,7 +8,8 @@ import type {
   MenuFragment,
   ParentMenuItemFragment,
 } from 'storefrontapi.generated';
-import type {loader as RootLoader} from '~/root';
+import type {loader} from '~/root';
+type RootLoader = typeof loader;
 import {countries} from '~/data/countries';
 
 import type {I18nLocale} from './type';
