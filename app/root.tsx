@@ -6,17 +6,27 @@ import {
   ScrollRestoration,
   isRouteErrorResponse,
   useRouteError,
+  useLoaderData,
 } from '@remix-run/react';
-import type {LinksFunction} from '@shopify/remix-oxygen';
+import type {LinksFunction, LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import {json} from '@shopify/remix-oxygen';
 
 import styles from '~/styles/app.css?url';
 import {GoogleTagManager} from '~/components/GoogleTagManager';
 
 export const links: LinksFunction = () => [{rel: 'stylesheet', href: styles}];
 
+export async function loader({context}: LoaderFunctionArgs) {
+  return json({
+    ENV: {
+      PUBLIC_GTM_ID: context.env.PUBLIC_GTM_ID,
+    },
+  });
+}
+
 export default function App() {
-  const {data} = useLoaderData<typeof loader>(); //
-  const {ENV} = data; //
+  const data = useLoaderData<typeof loader>();
+  const {ENV} = data;
 
   return (
     <html lang="en">
