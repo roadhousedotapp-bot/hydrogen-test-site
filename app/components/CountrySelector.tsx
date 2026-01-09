@@ -23,7 +23,7 @@ export function CountrySelector() {
   const pathWithoutLocale = `${pathname.replace(
     selectedLocale.pathPrefix,
     '',
-  )}${search}` ;
+  )}${search}`;
 
   const countries = (fetcher.data ?? {}) as Localizations;
   const defaultLocale = countries?.['default'];
