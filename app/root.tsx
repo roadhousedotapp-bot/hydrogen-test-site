@@ -13,13 +13,23 @@ import {json} from '@shopify/remix-oxygen';
 
 import styles from '~/styles/app.css?url';
 import {GoogleTagManager} from '~/components/GoogleTagManager';
+import {DEFAULT_LOCALE, parseSync} from '~/lib/utils';
 
 export const links: LinksFunction = () => [{rel: 'stylesheet', href: styles}];
 
 export async function loader({context}: LoaderFunctionArgs) {
+  const {cart, customerAccount, storefront, env} = context;
+
+  const isLoggedIn = await customerAccount.isLoggedIn();
+  const cartPromise = cart.get();
+  const selectedLocale = storefront.i18n;
+
   return json({
+    isLoggedIn,
+    cart: cartPromise,
+    selectedLocale,
     ENV: {
-      PUBLIC_GTM_ID: context.env.PUBLIC_GTM_ID,
+      PUBLIC_GTM_ID: env.PUBLIC_GTM_ID,
     },
   });
 }
@@ -46,6 +56,7 @@ export default function App() {
 
 export function ErrorBoundary() {
   const error = useRouteError();
+  const rootData = parseSync(useLoaderData());
 
   if (isRouteErrorResponse(error)) {
     return (
