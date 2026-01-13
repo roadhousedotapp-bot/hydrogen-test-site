@@ -9,11 +9,7 @@ import type {
   ShopPolicy,
   Image,
 } from '@shopify/hydrogen/storefront-api-types';
-import type {
-  BreadcrumbList,
-  CollectionPage,
-  Offer,
-} from 'schema-dts';
+import type {BreadcrumbList, CollectionPage, Offer} from 'schema-dts';
 
 import type {ShopFragment} from 'storefrontapi.generated';
 
