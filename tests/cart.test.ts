@@ -1,4 +1,5 @@
 import {test, expect} from '@playwright/test';
+
 import {formatPrice, normalizePrice} from './utils';
 
 test.describe('Cart', () => {
