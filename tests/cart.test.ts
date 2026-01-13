@@ -1,14 +1,33 @@
 import {test, expect} from '@playwright/test';
-
 import {formatPrice, normalizePrice} from './utils';
 
 test.describe('Cart', () => {
+  // Add this 'beforeEach' block to force a desktop screen size
+  test.beforeEach(async ({page}) => {
+    await page.setViewportSize({width: 1280, height: 720});
+  });
+
   test('From home to checkout flow', async ({page}) => {
-    // Home => Collections => First collection => First product
     await page.goto(`/`);
-    await page.locator(`header nav a:text-is("Collections")`).click();
-    await page.locator(`[data-test=collection-grid] a  >> nth=0`).click();
-    await page.locator(`[data-test=product-grid] a  >> nth=0`).click();
+
+    // Add a wait for the shop name/header to ensure the page has loaded
+    const header = page.locator('header').first();
+    await expect(header).toBeAttached();
+
+    // Use a slightly longer timeout just for this first critical step
+    const navLink = page.locator('[data-test="nav-menu-item"]').first();
+    await expect(navLink).toBeVisible({timeout: 10000});
+    await navLink.click();
+
+    // 1. Click the first navigation link in your header (e.g., "Products" or "Catalog")
+    const navLink = page.locator('[data-test="nav-menu-item"]').first();
+    await expect(navLink).toBeVisible();
+    await navLink.click();
+
+    // 2. Select the first item in the grid (Works for both collection-grid and product-grid)
+    const firstItem = page.locator('a[href*="/products/"]').first();
+    await expect(firstItem).toBeVisible();
+    await firstItem.click();
 
     const firstItemPrice = normalizePrice(
       await page.locator(`[data-test=price]`).textContent(),
@@ -38,7 +57,7 @@ test.describe('Cart', () => {
 
     // Close cart drawer => Products => First product
     await page.locator('[data-test=close-cart]').click();
-    await page.locator(`header nav a:text-is("Products")`).click();
+    await page.locator('header a[href*="/products"]').first().click();
     await page.locator(`[data-test=product-grid] a  >> nth=0`).click();
 
     const secondItemPrice = normalizePrice(

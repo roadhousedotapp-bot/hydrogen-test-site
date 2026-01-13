@@ -49,8 +49,8 @@ export function PageLayout({children, layout}: LayoutProps) {
             Skip to content
           </a>
         </div>
-        {headerMenu && layout?.shop.name && (
-          <Header title={layout.shop.name} menu={headerMenu} />
+        {layout?.shop.name && (
+          <Header title={layout.shop.name} menu={headerMenu || undefined} />
         )}
         <main role="main" id="mainContent" className="flex-grow">
           {children}
@@ -157,6 +157,7 @@ function MenuMobileNav({
         <span key={item.id} className="block">
           <Link
             to={item.to}
+            data-test="nav-menu-item"
             target={item.target}
             onClick={onClose}
             className={({isActive}) =>
@@ -281,6 +282,7 @@ function DesktopHeader({
             <Link
               key={item.id}
               to={item.to}
+              data-test="nav-menu-item"
               target={item.target}
               prefetch="intent"
               className={({isActive}) =>
@@ -415,7 +417,7 @@ function Footer({menu}: {menu?: EnhancedMenu}) {
     ? menu?.items?.length + 1 > 4
       ? 4
       : menu?.items?.length + 1
-    : [];
+    : 0;
 
   return (
     <Section

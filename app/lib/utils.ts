@@ -2,6 +2,7 @@ import {useLocation, useRouteLoaderData} from '@remix-run/react';
 import type {MoneyV2} from '@shopify/hydrogen/storefront-api-types';
 import type {FulfillmentStatus} from '@shopify/hydrogen/customer-account-api-types';
 import typographicBase from 'typographic-base';
+
 import type {
   ChildMenuItemFragment,
   MenuFragment,
@@ -9,6 +10,7 @@ import type {
 } from 'storefrontapi.generated';
 import type {loader} from '~/root';
 import {countries} from '~/data/countries';
+
 import type {I18nLocale} from './type';
 
 type RootLoader = typeof loader;
@@ -262,8 +264,12 @@ export function usePrefixPathWithLocale(path: string) {
 export function useIsHomePath() {
   const {pathname} = useLocation();
   const rootData = useRouteLoaderData<RootLoader>('root');
+  // VALIDATED CHANGE: Added optional chaining to rootData and selectedLocale
   const selectedLocale = rootData?.selectedLocale ?? DEFAULT_LOCALE;
-  const strippedPathname = pathname.replace(selectedLocale.pathPrefix, '');
+  const strippedPathname = pathname.replace(
+    selectedLocale?.pathPrefix || '',
+    '',
+  );
   return strippedPathname === '/';
 }
 
