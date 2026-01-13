@@ -8,6 +8,7 @@ import type {
   MenuFragment,
   ParentMenuItemFragment,
 } from 'storefrontapi.generated';
+
 import type {loader} from '~/root';
 import {countries} from '~/data/countries';
 
