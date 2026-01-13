@@ -10,14 +10,9 @@ import type {
   Image,
 } from '@shopify/hydrogen/storefront-api-types';
 import type {
-  Article as SeoArticle,
   BreadcrumbList,
-  Blog as SeoBlog,
   CollectionPage,
   Offer,
-  Organization,
-  Product as SeoProduct,
-  WebPage,
 } from 'schema-dts';
 
 import type {ShopFragment} from 'storefrontapi.generated';
@@ -43,7 +38,7 @@ function root({
       '@context': 'https://schema.org',
       '@type': 'Organization',
       name: shop.name,
-      logo: (shop as any).brand?.logo?.image?.url, // Casting to any for brand as it's not in the base Shop type
+      logo: shop.brand?.logo?.image?.url,
       sameAs: [
         'https://twitter.com/shopify',
         'https://facebook.com/shopify',
@@ -481,9 +476,6 @@ function truncate(str: string, num = 155): string {
   return str.slice(0, num - 3) + '...';
 }
 
-/**
- * Define the fragment so Hydrogen Codegen can export the ShopFragment type
- */
 const SHOP_FRAGMENT = `#graphql
   fragment Shop on Shop {
     name
