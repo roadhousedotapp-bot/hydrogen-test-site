@@ -8,9 +8,11 @@ import type {
   ParentMenuItemFragment,
 } from 'storefrontapi.generated';
 import type {loader} from '~/root';
-type RootLoader = typeof loader;
 import {countries} from '~/data/countries';
 import type {I18nLocale} from './type';
+
+type RootLoader = typeof loader;
+
 type EnhancedMenuItemProps = {
   to: string;
   target: string;
@@ -88,7 +90,7 @@ function resolveToFromType(
 ) {
   if (!pathname || !type) return '';
 
-  const defaultPrefixes = {
+  const defaultPrefixes: Record<string, string> = {
     BLOG: 'blogs',
     COLLECTION: 'collections',
     COLLECTIONS: 'collections',
@@ -145,7 +147,7 @@ function parseItem(primaryDomain: string, env: Env, customPrefixes = {}) {
     | EnhancedMenu['items'][number]['items'][0]
     | null {
     if (!item?.url || !item?.type) {
-      console.warn('Invalid menu item.  Must include a url and type.');
+      console.warn('Invalid menu item. Must include a url and type.');
       return null;
     }
 
@@ -168,7 +170,7 @@ function parseItem(primaryDomain: string, env: Env, customPrefixes = {}) {
           to: item.url,
         };
 
-    if ('items' in item) {
+    if ('items' in item && item.items) {
       return {
         ...parsedItem,
         items: item.items
@@ -212,7 +214,7 @@ export const getInputStyleClasses = (isError?: string | null) => {
 };
 
 export function statusMessage(status: FulfillmentStatus) {
-  const translations: Record<FulfillmentStatus, string> = {
+  const translations: Record<string, string> = {
     SUCCESS: 'Success',
     PENDING: 'Pending',
     OPEN: 'Open',
@@ -221,7 +223,7 @@ export function statusMessage(status: FulfillmentStatus) {
     CANCELLED: 'Cancelled',
   };
   try {
-    return translations?.[status];
+    return translations[status] || status;
   } catch (error) {
     return status;
   }
@@ -289,10 +291,10 @@ export function parseSync(data: any) {
   }
 }
 
-/**
- * Define the fragments so Hydrogen Codegen can export the types
- * ChildMenuItemFragment, MenuFragment, ParentMenuItemFragment
- */
+/*
+  Define the fragments so Hydrogen Codegen can export the types
+  ChildMenuItemFragment, MenuFragment, ParentMenuItemFragment
+*/
 const MENU_FRAGMENT = `#graphql
   fragment MenuItem on MenuItem {
     id
