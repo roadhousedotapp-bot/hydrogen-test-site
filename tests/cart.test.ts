@@ -1,9 +1,7 @@
 import {test, expect} from '@playwright/test';
-
 import {formatPrice, normalizePrice} from './utils';
 
 test.describe('Cart', () => {
-  // Add this 'beforeEach' block to force a desktop screen size
   test.beforeEach(async ({page}) => {
     await page.setViewportSize({width: 1280, height: 720});
   });
@@ -11,17 +9,23 @@ test.describe('Cart', () => {
   test('From home to checkout flow', async ({page}) => {
     await page.goto(`/`);
 
-    // Add a wait for the shop name/header to ensure the page has loaded
-    const header = page.locator('header').first();
-    await expect(header).toBeAttached();
+    // 1. Check if we are stuck on the password page (Common in Dev Stores)
+    if (await page.getByPlaceholder('Enter store password').isVisible()) {
+        console.log('Detected Password Page. Tests might fail if not authenticated.');
+        // Optional: You can add logic here to enter the password if you have one
+    }
 
-    // Use a slightly longer timeout just for this first critical step
-    // This finds the first menu item (e.g., "Products" or "Catalog") and clicks it
+    // 2. Wait for the header to attach. 
+    // We increase timeout to 30s because Hydrogen cold starts can be slow.
+    const header = page.locator('header').first();
+    await expect(header).toBeAttached({ timeout: 30000 });
+
+    // 3. Find the menu item
     const navLink = page.locator('[data-test="nav-menu-item"]').first();
     await expect(navLink).toBeVisible({timeout: 10000});
     await navLink.click();
 
-    // 2. Select the first item in the grid (Works for both collection-grid and product-grid)
+    // 4. Select the first product
     const firstItem = page.locator('a[href*="/products/"]').first();
     await expect(firstItem).toBeVisible();
     await firstItem.click();
@@ -37,7 +41,7 @@ test.describe('Cart', () => {
       'should show the correct price',
     ).toContainText(formatPrice(firstItemPrice));
 
-    // Add an extra unit by increasing quantity
+    // Increase quantity
     await page
       .locator(`button :text-is("+")`)
       .click({clickCount: 1, delay: 600});
@@ -52,10 +56,10 @@ test.describe('Cart', () => {
       'should increase quantity',
     ).toContainText('2');
 
-    // Close cart drawer => Products => First product
+    // Close cart drawer => Click Nav again => Click Product again
     await page.locator('[data-test=close-cart]').click();
-
-    // We reuse the data-test selector here to be safe, instead of relying on specific hrefs
+    
+    // Re-click the nav menu item we found earlier
     await page.locator('[data-test="nav-menu-item"]').first().click();
     await page.locator(`[data-test=product-grid] a >> nth=0`).click();
 
@@ -63,7 +67,6 @@ test.describe('Cart', () => {
       await page.locator(`[data-test=price]`).textContent(),
     );
 
-    // Add another unit by adding to cart the same item
     await page.locator(`[data-test=add-to-cart]`).click();
 
     await expect(
@@ -85,6 +88,7 @@ test.describe('Cart', () => {
 
     await page.locator('a :text("Checkout")').click();
 
+    // Validate Checkout URL
     await expect(page.url(), 'should navigate to checkout').toMatch(
       /checkout\.hydrogen\.shop\/checkouts\/[\d\w]+/,
     );
