@@ -54,7 +54,7 @@ test.describe('Cart', () => {
 
     // Close cart drawer => Products => First product
     await page.locator('[data-test=close-cart]').click();
-    
+
     // We reuse the data-test selector here to be safe, instead of relying on specific hrefs
     await page.locator('[data-test="nav-menu-item"]').first().click();
     await page.locator(`[data-test=product-grid] a >> nth=0`).click();
