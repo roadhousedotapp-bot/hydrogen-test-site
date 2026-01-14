@@ -16,13 +16,9 @@ test.describe('Cart', () => {
     await expect(header).toBeAttached();
 
     // Use a slightly longer timeout just for this first critical step
+    // This finds the first menu item (e.g., "Products" or "Catalog") and clicks it
     const navLink = page.locator('[data-test="nav-menu-item"]').first();
     await expect(navLink).toBeVisible({timeout: 10000});
-    await navLink.click();
-
-    // 1. Click the first navigation link in your header (e.g., "Products" or "Catalog")
-    const navLink = page.locator('[data-test="nav-menu-item"]').first();
-    await expect(navLink).toBeVisible();
     await navLink.click();
 
     // 2. Select the first item in the grid (Works for both collection-grid and product-grid)
@@ -58,8 +54,10 @@ test.describe('Cart', () => {
 
     // Close cart drawer => Products => First product
     await page.locator('[data-test=close-cart]').click();
-    await page.locator('header a[href*="/products"]').first().click();
-    await page.locator(`[data-test=product-grid] a  >> nth=0`).click();
+    
+    // We reuse the data-test selector here to be safe, instead of relying on specific hrefs
+    await page.locator('[data-test="nav-menu-item"]').first().click();
+    await page.locator(`[data-test=product-grid] a >> nth=0`).click();
 
     const secondItemPrice = normalizePrice(
       await page.locator(`[data-test=price]`).textContent(),
