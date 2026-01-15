@@ -45,7 +45,8 @@ let config: PlaywrightTestConfig = defineConfig({
     // CRITICAL: Pass CI environment variables to the local server process
     env: {
       SESSION_SECRET: process.env.SESSION_SECRET || '',
-      PUBLIC_STOREFRONT_API_TOKEN: process.env.PUBLIC_STOREFRONT_API_TOKEN || '',
+      PUBLIC_STOREFRONT_API_TOKEN:
+        process.env.PUBLIC_STOREFRONT_API_TOKEN || '',
       PUBLIC_STORE_DOMAIN: process.env.PUBLIC_STORE_DOMAIN || '',
     },
   },
@@ -76,7 +77,7 @@ if (process.env.URL) {
       ...config.use,
       baseURL: 'http://localhost:3000',
     },
-    // We removed the second webServer block from here because it's now 
+    // We removed the second webServer block from here because it's now
     // globally defined above with the correct 'env' settings.
   };
 }
