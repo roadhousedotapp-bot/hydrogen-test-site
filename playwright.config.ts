@@ -16,12 +16,11 @@ let config: PlaywrightTestConfig = defineConfig({
   },
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 1, // Added 1 retry for local runs to handle hydration blips
+  retries: process.env.CI ? 2 : 1,
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
     actionTimeout: 15000,
-    /* Cleaned up: Record artifacts only when things go wrong */
     video: 'on-first-retry',
     screenshot: 'only-on-failure',
     trace: 'on-first-retry',
@@ -37,11 +36,18 @@ let config: PlaywrightTestConfig = defineConfig({
     },
   ],
 
+  // Consolidating the WebServer here
   webServer: {
     command: 'npm run preview',
     port: 3000,
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
+    // CRITICAL: Pass CI environment variables to the local server process
+    env: {
+      SESSION_SECRET: process.env.SESSION_SECRET || '',
+      PUBLIC_STOREFRONT_API_TOKEN: process.env.PUBLIC_STOREFRONT_API_TOKEN || '',
+      PUBLIC_STORE_DOMAIN: process.env.PUBLIC_STORE_DOMAIN || '',
+    },
   },
 });
 
@@ -61,6 +67,7 @@ if (process.env.URL) {
   config = {
     ...config,
     use,
+    // Remove webServer from here if it exists to avoid conflicts
   };
 } else {
   config = {
@@ -69,12 +76,8 @@ if (process.env.URL) {
       ...config.use,
       baseURL: 'http://localhost:3000',
     },
-    webServer: {
-      command: 'npm run preview',
-      port: 3000,
-      reuseExistingServer: !process.env.CI,
-      timeout: 120 * 1000,
-    },
+    // We removed the second webServer block from here because it's now 
+    // globally defined above with the correct 'env' settings.
   };
 }
 
