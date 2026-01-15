@@ -84,6 +84,10 @@ jobs:
     concurrency:
       group: ci-e2e-${{ github.ref }}
       cancel-in-progress: true
+    env:
+      PUBLIC_STORE_DOMAIN: ${{ secrets.PUBLIC_STORE_DOMAIN }}
+      PUBLIC_STOREFRONT_API_TOKEN: ${{ secrets.PUBLIC_STOREFRONT_API_TOKEN }}
+      SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -92,7 +96,6 @@ jobs:
         uses: ./.github/actions/end-to-end-tests
         with:
           url: http://localhost:3000
-          # Pass the secrets as INPUTS (using 'with') instead of 'env'
           public-store-domain: ${{ secrets.PUBLIC_STORE_DOMAIN }}
           public-storefront-api-token: ${{ secrets.PUBLIC_STOREFRONT_API_TOKEN }}
           session-secret: ${{ secrets.SESSION_SECRET }}
