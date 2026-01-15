@@ -38,10 +38,11 @@ export function Cart({
   const linesCount = Boolean(cart?.lines?.edges?.length || 0);
 
   return (
-    <>
+    /* We use a stable ID here that Playwright can always find once the Cart renders */
+    <div data-test="cart-main" className="h-full" id="cart-main">
       <CartEmpty hidden={linesCount} onClose={onClose} layout={layout} />
       <CartDetails cart={cart} layout={layout} />
-    </>
+    </div>
   );
 }
 
@@ -52,7 +53,6 @@ export function CartDetails({
   layout: Layouts;
   cart: CartType | null;
 }) {
-  // @todo: get optimistic cart cost
   const cartHasItems = !!cart && cart.totalQuantity > 0;
   const container = {
     drawer: 'grid grid-cols-1 h-screen-no-nav grid-rows-[1fr_auto]',
@@ -60,7 +60,7 @@ export function CartDetails({
   };
 
   return (
-    <div className={container[layout]}>
+    <div className={container[layout]} data-test="cart-details">
       <CartLines lines={cart?.lines} layout={layout} />
       {cartHasItems && (
         <CartSummary cost={cart.cost} layout={layout}>
@@ -72,11 +72,6 @@ export function CartDetails({
   );
 }
 
-/**
- * Temporary discount UI
- * @param discountCodes the current discount codes applied to the cart
- * @todo rework when a design is ready
- */
 function CartDiscounts({
   discountCodes,
 }: {
@@ -89,7 +84,6 @@ function CartDiscounts({
 
   return (
     <>
-      {/* Have existing discount, display it with a remove option */}
       <dl className={codes && codes.length !== 0 ? 'grid' : 'hidden'}>
         <div className="flex items-center justify-between font-medium">
           <Text as="dt">Discount(s)</Text>
@@ -107,7 +101,6 @@ function CartDiscounts({
         </div>
       </dl>
 
-      {/* Show an input to apply a discount */}
       <UpdateDiscountForm discountCodes={codes}>
         <div
           className={clsx(
@@ -188,12 +181,11 @@ function CartCheckoutActions({checkoutUrl}: {checkoutUrl: string}) {
 
   return (
     <div className="flex flex-col mt-2">
-      <a href={checkoutUrl} target="_self">
+      <a href={checkoutUrl} target="_self" data-test="checkout-button">
         <Button as="span" width="full">
           Continue to Checkout
         </Button>
       </a>
-      {/* @todo: <CartShopPayButton cart={cart} /> */}
     </div>
   );
 }
@@ -220,13 +212,13 @@ function CartSummary({
       <dl className="grid">
         <div className="flex items-center justify-between font-medium">
           <Text as="dt">Subtotal</Text>
-          <Text as="dd" data-test="subtotal">
+          <dd data-test="subtotal">
             {cost?.subtotalAmount?.amount ? (
               <Money data={cost?.subtotalAmount} />
             ) : (
               '-'
             )}
-          </Text>
+          </dd>
         </div>
       </dl>
       {children}
@@ -234,13 +226,11 @@ function CartSummary({
   );
 }
 
-type OptimisticData = {
-  action?: string;
-  quantity?: number;
-};
-
 function CartLineItem({line}: {line: CartLine}) {
-  const optimisticData = useOptimisticData<OptimisticData>(line?.id);
+  const optimisticData = useOptimisticData<{
+    action?: string;
+    quantity?: number;
+  }>(line?.id);
 
   if (!line?.id) return null;
 
@@ -251,10 +241,9 @@ function CartLineItem({line}: {line: CartLine}) {
   return (
     <li
       key={id}
+      data-test="cart-line-item"
       className="flex gap-4"
       style={{
-        // Hide the line item if the optimistic data action is remove
-        // Do not remove the form from the DOM
         display: optimisticData?.action === 'remove' ? 'none' : 'flex',
       }}
     >
@@ -297,7 +286,7 @@ function CartLineItem({line}: {line: CartLine}) {
             <ItemRemoveButton lineId={id} />
           </div>
         </div>
-        <Text>
+        <Text data-test="cart-line-price">
           <CartLinePrice line={line} as="span" />
         </Text>
       </div>
@@ -328,12 +317,11 @@ function ItemRemoveButton({lineId}: {lineId: CartLine['id']}) {
 
 function CartLineQuantityAdjust({line}: {line: CartLine}) {
   const optimisticId = line?.id;
-  const optimisticData = useOptimisticData<OptimisticData>(optimisticId);
+  const optimisticData = useOptimisticData<{quantity?: number}>(optimisticId);
 
   if (!line || typeof line?.quantity === 'undefined') return null;
 
   const optimisticQuantity = optimisticData?.quantity || line.quantity;
-
   const {id: lineId} = line;
   const prevQuantity = Number(Math.max(0, optimisticQuantity - 1).toFixed(0));
   const nextQuantity = Number((optimisticQuantity + 1).toFixed(0));
@@ -419,9 +407,7 @@ function CartLinePrice({
       ? line.cost.totalAmount
       : line.cost.compareAtAmountPerQuantity;
 
-  if (moneyV2 == null) {
-    return null;
-  }
+  if (moneyV2 == null) return null;
 
   return <Money withoutTrailingZeros {...passthroughProps} data={moneyV2} />;
 }
@@ -450,7 +436,12 @@ export function CartEmpty({
   };
 
   return (
-    <div ref={scrollRef} className={container[layout]} hidden={hidden}>
+    <div
+      ref={scrollRef}
+      className={container[layout]}
+      hidden={hidden}
+      data-test="cart-empty"
+    >
       <section className="grid gap-6">
         <Text format>
           Looks like you haven&rsquo;t added anything yet, let&rsquo;s get you

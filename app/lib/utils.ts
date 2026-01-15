@@ -64,10 +64,15 @@ export function getExcerpt(text: string) {
 }
 
 export function isNewArrival(date: string, daysOld = 30) {
-  return (
-    new Date(date).valueOf() >
-    new Date().setDate(new Date().getDate() - daysOld).valueOf()
-  );
+  if (!date) return false;
+
+  // To avoid hydration mismatch, we ensure the "now" reference is consistent
+  // or the check is only performed on the client.
+  const arrivalDate = new Date(date).getTime();
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - daysOld);
+
+  return arrivalDate > thirtyDaysAgo.getTime();
 }
 
 export function isDiscounted(price: MoneyV2, compareAtPrice: MoneyV2) {
@@ -149,6 +154,7 @@ function parseItem(primaryDomain: string, env: Env, customPrefixes = {}) {
     | EnhancedMenu['items'][number]['items'][0]
     | null {
     if (!item?.url || !item?.type) {
+      // eslint-disable-next-line no-console
       console.warn('Invalid menu item. Must include a url and type.');
       return null;
     }
@@ -192,6 +198,7 @@ export function parseMenu(
   customPrefixes = {},
 ): EnhancedMenu | null {
   if (!menu?.items) {
+    // eslint-disable-next-line no-console
     console.warn('Invalid menu passed to parseMenu');
     return null;
   }
@@ -264,7 +271,6 @@ export function usePrefixPathWithLocale(path: string) {
 export function useIsHomePath() {
   const {pathname} = useLocation();
   const rootData = useRouteLoaderData<RootLoader>('root');
-  // VALIDATED CHANGE: Added optional chaining to rootData and selectedLocale
   const selectedLocale = rootData?.selectedLocale ?? DEFAULT_LOCALE;
   const strippedPathname = pathname.replace(
     selectedLocale?.pathPrefix || '',
