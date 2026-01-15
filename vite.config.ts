@@ -9,7 +9,7 @@ export default defineConfig({
     hydrogen(),
     oxygen(),
     remix({
-      presets: [hydrogen.preset()],
+      // Removed presets: [hydrogen.preset()] to fix TS2339 error
       future: {
         v3_fetcherPersist: true,
         v3_relativeSplatPath: true,
@@ -37,7 +37,7 @@ export default defineConfig({
   },
   build: {
     // Allow a strict Content-Security-Policy
-    // withtout inlining assets as base64:
+    // without inlining assets as base64:
     assetsInlineLimit: 0,
   },
 });
