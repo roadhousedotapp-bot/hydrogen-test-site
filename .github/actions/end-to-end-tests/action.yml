@@ -57,12 +57,14 @@ runs:
     - name: 💽 Install Playwright Browsers (all)
       shell: 'bash'
       if: steps.playwright-cache.outputs.cache-hit != 'true'
-      run: npx playwright install --with-deps chromium
+      # Added sudo to ensure system libraries are actually installed
+      run: sudo npx playwright install --with-deps chromium
 
     - name: 💽 Install Playwright (only system deps)
       shell: 'bash'
       if: steps.playwright-cache.outputs.cache-hit == 'true'
-      run: npx playwright install-deps chromium
+      # Added sudo to ensure OS-level .so files are restored to the fresh runner
+      run: sudo npx playwright install-deps chromium
 
     - name: 🍄 Run Playwright tests
       shell: 'bash'
