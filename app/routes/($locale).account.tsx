@@ -9,11 +9,17 @@ import {
 import {Suspense} from 'react';
 import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {flattenConnection} from '@shopify/hydrogen';
-
 import type {
   CustomerDetailsFragment,
   OrderCardFragment,
 } from 'customer-accountapi.generated';
+
+import {doLogout} from './($locale).account_.logout';
+import {
+  getFeaturedData,
+  type FeaturedData,
+} from './($locale).featured-products';
+
 import {PageHeader, Text} from '~/components/Text';
 import {Button} from '~/components/Button';
 import {OrderCard} from '~/components/OrderCard';
@@ -26,15 +32,13 @@ import {usePrefixPathWithLocale} from '~/lib/utils';
 import {CACHE_NONE, routeHeaders} from '~/data/cache';
 import {CUSTOMER_DETAILS_QUERY} from '~/graphql/customer-account/CustomerDetailsQuery';
 
-import {doLogout} from './($locale).account_.logout';
-import {
-  getFeaturedData,
-  type FeaturedData,
-} from './($locale).featured-products';
-
 export const headers = routeHeaders;
 
-export async function loader({request, context, params}: LoaderFunctionArgs) {
+export async function loader({
+  request: _request,
+  context,
+  params: _params,
+}: LoaderFunctionArgs) {
   const {data, errors} = await context.customerAccount.query(
     CUSTOMER_DETAILS_QUERY,
   );
@@ -69,7 +73,7 @@ export async function loader({request, context, params}: LoaderFunctionArgs) {
 }
 
 export default function Authenticated() {
-  const data = useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>() as unknown as AccountType;
   const outlet = useOutlet();
   const matches = useMatches();
 

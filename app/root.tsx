@@ -26,16 +26,15 @@ import {
 } from '@shopify/hydrogen';
 import invariant from 'tiny-invariant';
 
+import {DEFAULT_LOCALE, parseMenu} from './lib/utils';
+
 import {PageLayout} from '~/components/PageLayout';
 import {GenericError} from '~/components/GenericError';
 import {NotFound} from '~/components/NotFound';
 import {GoogleTagManager} from '~/components/GoogleTagManager';
 import {seoPayload} from '~/lib/seo.server';
-
 import favicon from '~/assets/favicon.svg';
 import styles from '~/styles/app.css?url';
-
-import {DEFAULT_LOCALE, parseMenu} from './lib/utils';
 
 export type RootLoader = typeof loader;
 
@@ -156,17 +155,17 @@ function Layout({children}: {children?: React.ReactNode}) {
         <link rel="stylesheet" href={styles}></link>
         <Meta />
         <Links />
-         {/* @description Add Google Tag Manager script to head */}
-        <Script>
-  nonce={nonce}
-  dangerouslySetInnerHTML={{
-    __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        {/* @description Add Google Tag Manager script to head */}
+        <Script
+          nonce={nonce}
+          dangerouslySetInnerHTML={{
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-5P9R6MP8');`,
-  }}
-</Script>
+          }}
+        />
       </head>
       <body>
         {/* @description Add Google Tag Manager noscript iframe for users without JavaScript */}
@@ -218,11 +217,9 @@ export function ErrorBoundary({error}: {error: Error}) {
   const routeError = useRouteError();
   const isRouteError = isRouteErrorResponse(routeError);
 
-  let title = 'Error';
   let pageType = 'page';
 
   if (isRouteError) {
-    title = 'Not found';
     if (routeError.status === 404) pageType = routeError.data || pageType;
   }
 

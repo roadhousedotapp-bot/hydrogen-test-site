@@ -31,7 +31,7 @@ export async function loader({
     if (_reverse === 'true') {
       reverse = true;
     }
-  } catch (_) {
+  } catch {
     // noop
   }
 
@@ -41,7 +41,7 @@ export async function loader({
     if (typeof _count === 'string') {
       count = parseInt(_count);
     }
-  } catch (_) {
+  } catch {
     // noop
   }
 

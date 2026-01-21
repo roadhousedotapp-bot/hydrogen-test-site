@@ -10,16 +10,15 @@ import type {
   Image,
 } from '@shopify/hydrogen/storefront-api-types';
 import type {
-  Article as SeoArticle,
+  Article as _SeoArticle,
   BreadcrumbList,
-  Blog as SeoBlog,
+  Blog as _SeoBlog,
   CollectionPage,
   Offer,
-  Organization,
-  Product as SeoProduct,
-  WebPage,
+  Organization as _Organization,
+  Product as _SeoProduct,
+  WebPage as _WebPage,
 } from 'schema-dts';
-
 import type {ShopFragment} from 'storefrontapi.generated';
 
 function root({

@@ -24,8 +24,8 @@ import type {
   Maybe,
   ProductOptionValueSwatch,
 } from '@shopify/hydrogen/storefront-api-types';
-
 import type {ProductFragment} from 'storefrontapi.generated';
+
 import {Heading, Section, Text} from '~/components/Text';
 import {Link} from '~/components/Link';
 import {Button} from '~/components/Button';
@@ -110,7 +110,7 @@ async function loadCriticalData({
  * fetched after the initial page load. If it's unavailable, the page should still 200.
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
-function loadDeferredData(args: LoaderFunctionArgs) {
+function loadDeferredData(_args: LoaderFunctionArgs) {
   // Put any API calls that are not critical to be available on first page render
   // For example: product reviews, product recommendations, social feeds.
 

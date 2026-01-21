@@ -41,7 +41,7 @@ export function SortFilter({
   filters,
   appliedFilters = [],
   children,
-  collections = [],
+  collections: _collections = [],
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   return (

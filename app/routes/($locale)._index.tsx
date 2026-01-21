@@ -80,7 +80,7 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
     })
     .catch((error) => {
       // Log query errors, but don't throw them so the page can still render
-      // eslint-disable-next-line no-console
+
       console.error(error);
       return null;
     });
@@ -95,7 +95,7 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
     })
     .catch((error) => {
       // Log query errors, but don't throw them so the page can still render
-      // eslint-disable-next-line no-console
+
       console.error(error);
       return null;
     });
@@ -109,7 +109,7 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
     })
     .catch((error) => {
       // Log query errors, but don't throw them so the page can still render
-      // eslint-disable-next-line no-console
+
       console.error(error);
       return null;
     });
@@ -124,7 +124,7 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
     })
     .catch((error) => {
       // Log query errors, but don't throw them so the page can still render
-      // eslint-disable-next-line no-console
+
       console.error(error);
       return null;
     });

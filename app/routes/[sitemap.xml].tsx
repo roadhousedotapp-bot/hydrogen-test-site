@@ -1,5 +1,4 @@
 import type {LoaderFunctionArgs} from '@shopify/remix-oxygen';
-
 import {getSitemapIndex} from 'app/lib/sitemap';
 
 export async function loader({
