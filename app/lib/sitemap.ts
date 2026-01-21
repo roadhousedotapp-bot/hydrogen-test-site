@@ -1,8 +1,6 @@
 import type {LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import type {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   CountryCode,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   LanguageCode,
 } from '@shopify/hydrogen/storefront-api-types';
 

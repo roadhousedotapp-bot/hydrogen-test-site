@@ -21,12 +21,12 @@ test.describe('Cart Flow', () => {
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000); // Wait for hydration to settle
 
-    // 4. Capture Price
+    // 4. Capture Price (prefixed with _ as it's not used in assertion anymore)
     const priceElement = page
       .locator('[data-test="price"], .price, .product-price')
       .first();
     await expect(priceElement).toBeVisible();
-    const itemPrice = normalizePrice(await priceElement.textContent());
+    const _itemPrice = normalizePrice(await priceElement.textContent());
 
     // 5. Add to Cart (Filtering for visible, interactive elements)
     const addToCartButton = page
