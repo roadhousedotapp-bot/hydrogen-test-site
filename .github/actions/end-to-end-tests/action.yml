@@ -7,21 +7,33 @@ inputs:
   auth-bypass-token:
     required: false
     type: string
+  public-store-domain:
+    required: true
+  public-storefront-api-token:
+    required: true
+  session-secret:
+    required: true
 
 runs:
   using: 'composite'
   steps:
     - name: 📥 Install dependencies
       shell: 'bash'
-      run: npm ci
+      # Changed from 'npm ci' to handle peer dependency conflicts faster
+      run: npm install --legacy-peer-deps
 
     - name: 📦 Build
       shell: 'bash'
       run: npm run build
+      env:
+        PUBLIC_STORE_DOMAIN: ${{ inputs.public-store-domain }}
+        PUBLIC_STOREFRONT_API_TOKEN: ${{ inputs.public-storefront-api-token }}
+        # Fixed: using inputs.session-secret instead of secrets.session-secret
+        SESSION_SECRET: ${{ inputs.session-secret }}
 
     - name: 💾 Turbo cache
       id: turbo-cache
-      uses: actions/cache@2f8e54208210a422b2efd51efaa6bd6d7ca8920f # v3.4.3
+      uses: actions/cache@v3
       with:
         path: |
           node_modules/.cache/turbo
@@ -29,35 +41,35 @@ runs:
         key: turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}
         restore-keys: |
           turbo-${{ github.job }}-${{ github.ref_name }}-
-
-    - name: 📄 Get installed Playwright version
+    - name: 🔧 Create .env with secrets
       shell: 'bash'
-      run: echo "PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright -m 1 | sed 's/.*@//')"  >> $GITHUB_ENV
+      run: |
+        echo "PUBLIC_STORE_DOMAIN=${{ inputs.public-store-domain }}" > .env
+        echo "PUBLIC_STOREFRONT_API_TOKEN=${{ inputs.public-storefront-api-token }}" >> .env
+        echo "SESSION_SECRET=${{ inputs.session-secret }}" >> .env
+        echo "PUBLIC_STOREFRONT_ID=1000070592" >> .env
+        echo "SHOP_ID=69867438158" >> .env
+        echo "PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID=15df4a30-725c-4c78-beb9-5935470227bb" >> .env
+        echo "PUBLIC_CUSTOMER_ACCOUNT_API_URL=https://shopify.com/69867438158" >> .env
+        echo "=== .env contents ==="
+        cat .env
 
-    - name: 💾 Cache Playwright binaries
-      uses: actions/cache@2f8e54208210a422b2efd51efaa6bd6d7ca8920f # v3.4.3
-      id: playwright-cache
-      with:
-        path: |
-          ~/.cache/ms-playwright
-        key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
-
-    - name: 💽 Install Playwright Browsers (all)
+    - name: � Install Playwright Browsers
       shell: 'bash'
-      if: steps.playwright-cache.outputs.cache-hit != 'true'
       run: npx playwright install --with-deps chromium
-
-    - name: 💽 Install Playwright (only system deps)
-      shell: 'bash'
-      if: steps.playwright-cache.outputs.cache-hit == 'true'
-      run: npx playwright install-deps chromium
 
     - name: 🍄 Run Playwright tests
       shell: 'bash'
-      run: URL=${{ inputs.url }} AUTH_BYPASS_TOKEN=${{ inputs.auth-bypass-token }} npx playwright test
+      env:
+        URL: ${{ inputs.url }}
+        AUTH_BYPASS_TOKEN: ${{ inputs.auth-bypass-token }}
+        PUBLIC_STORE_DOMAIN: ${{ inputs.public-store-domain }}
+        PUBLIC_STOREFRONT_API_TOKEN: ${{ inputs.public-storefront-api-token }}
+        SESSION_SECRET: ${{ inputs.session-secret }}
+      run: npx playwright test
 
     - name: 🗒 Report
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: playwright-report

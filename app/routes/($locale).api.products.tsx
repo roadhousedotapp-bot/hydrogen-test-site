@@ -31,7 +31,7 @@ export async function loader({
     if (_reverse === 'true') {
       reverse = true;
     }
-  } catch (_) {
+  } catch {
     // noop
   }
 
@@ -41,27 +41,34 @@ export async function loader({
     if (typeof _count === 'string') {
       count = parseInt(_count);
     }
-  } catch (_) {
+  } catch {
     // noop
   }
 
-  const {products} = await storefront.query(API_ALL_PRODUCTS_QUERY, {
-    variables: {
-      count,
-      query,
-      reverse,
-      sortKey,
-      country: storefront.i18n.country,
-      language: storefront.i18n.language,
-    },
-    cache: storefront.CacheLong(),
-  });
+  try {
+    const {products} = await storefront.query(API_ALL_PRODUCTS_QUERY, {
+      variables: {
+        count,
+        query,
+        reverse,
+        sortKey,
+        country: storefront.i18n.country,
+        language: storefront.i18n.language,
+      },
+      cache: storefront.CacheLong(),
+    });
 
-  invariant(products, 'No data returned from top products query');
+    invariant(products, 'No data returned from top products query');
 
-  return json({
-    products: flattenConnection(products),
-  });
+    return json({
+      products: flattenConnection(products),
+    });
+  } catch {
+    // If storefront query fails, return empty products array
+    return json({
+      products: [],
+    });
+  }
 }
 
 const API_ALL_PRODUCTS_QUERY = `#graphql

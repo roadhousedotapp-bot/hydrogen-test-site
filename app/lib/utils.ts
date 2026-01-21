@@ -2,16 +2,18 @@ import {useLocation, useRouteLoaderData} from '@remix-run/react';
 import type {MoneyV2} from '@shopify/hydrogen/storefront-api-types';
 import type {FulfillmentStatus} from '@shopify/hydrogen/customer-account-api-types';
 import typographicBase from 'typographic-base';
-
 import type {
   ChildMenuItemFragment,
   MenuFragment,
   ParentMenuItemFragment,
 } from 'storefrontapi.generated';
-import type {RootLoader} from '~/root';
-import {countries} from '~/data/countries';
 
 import type {I18nLocale} from './type';
+
+import type {loader} from '~/root';
+import {countries} from '~/data/countries';
+
+type RootLoader = typeof loader;
 
 type EnhancedMenuItemProps = {
   to: string;
@@ -62,10 +64,15 @@ export function getExcerpt(text: string) {
 }
 
 export function isNewArrival(date: string, daysOld = 30) {
-  return (
-    new Date(date).valueOf() >
-    new Date().setDate(new Date().getDate() - daysOld).valueOf()
-  );
+  if (!date) return false;
+
+  // To avoid hydration mismatch, we ensure the "now" reference is consistent
+  // or the check is only performed on the client.
+  const arrivalDate = new Date(date).getTime();
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - daysOld);
+
+  return arrivalDate > thirtyDaysAgo.getTime();
 }
 
 export function isDiscounted(price: MoneyV2, compareAtPrice: MoneyV2) {
@@ -90,18 +97,14 @@ function resolveToFromType(
 ) {
   if (!pathname || !type) return '';
 
-  /*
-    MenuItemType enum
-    @see: https://shopify.dev/api/storefront/unstable/enums/MenuItemType
-  */
-  const defaultPrefixes = {
+  const defaultPrefixes: Record<string, string> = {
     BLOG: 'blogs',
     COLLECTION: 'collections',
-    COLLECTIONS: 'collections', // Collections All (not documented)
+    COLLECTIONS: 'collections',
     FRONTPAGE: 'frontpage',
     HTTP: '',
     PAGE: 'pages',
-    CATALOG: 'collections/all', // Products All
+    CATALOG: 'collections/all',
     PRODUCT: 'products',
     SEARCH: 'search',
     SHOP_POLICY: 'policies',
@@ -115,7 +118,6 @@ function resolveToFromType(
   };
 
   switch (true) {
-    // special cases
     case type === 'FRONTPAGE':
       return '/';
 
@@ -135,7 +137,6 @@ function resolveToFromType(
     case type === 'CATALOG':
       return `/${routePrefix.CATALOG}`;
 
-    // common cases: BLOG, PAGE, COLLECTION, PRODUCT, SHOP_POLICY, HTTP
     default:
       return routePrefix[type]
         ? `/${routePrefix[type]}/${handle}`
@@ -143,9 +144,6 @@ function resolveToFromType(
   }
 }
 
-/*
-  Parse each menu link and adding, isExternal, to and target
-*/
 function parseItem(primaryDomain: string, env: Env, customPrefixes = {}) {
   return function (
     item:
@@ -156,34 +154,30 @@ function parseItem(primaryDomain: string, env: Env, customPrefixes = {}) {
     | EnhancedMenu['items'][number]['items'][0]
     | null {
     if (!item?.url || !item?.type) {
-      // eslint-disable-next-line no-console
-      console.warn('Invalid menu item.  Must include a url and type.');
+      console.warn('Invalid menu item. Must include a url and type.');
       return null;
     }
 
-    // extract path from url because we don't need the origin on internal to attributes
     const {host, pathname} = new URL(item.url);
 
     const isInternalLink =
       host === new URL(primaryDomain).host || host === env.PUBLIC_STORE_DOMAIN;
 
     const parsedItem = isInternalLink
-      ? // internal links
-        {
+      ? {
           ...item,
           isExternal: false,
           target: '_self',
           to: resolveToFromType({type: item.type, customPrefixes, pathname}),
         }
-      : // external links
-        {
+      : {
           ...item,
           isExternal: true,
           target: '_blank',
           to: item.url,
         };
 
-    if ('items' in item) {
+    if ('items' in item && item.items) {
       return {
         ...parsedItem,
         items: item.items
@@ -196,11 +190,6 @@ function parseItem(primaryDomain: string, env: Env, customPrefixes = {}) {
   };
 }
 
-/*
-  Recursively adds `to` and `target` attributes to links based on their url
-  and resource type.
-  It optionally overwrites url paths based on item.type
-*/
 export function parseMenu(
   menu: MenuFragment,
   primaryDomain: string,
@@ -208,7 +197,6 @@ export function parseMenu(
   customPrefixes = {},
 ): EnhancedMenu | null {
   if (!menu?.items) {
-    // eslint-disable-next-line no-console
     console.warn('Invalid menu passed to parseMenu');
     return null;
   }
@@ -233,7 +221,7 @@ export const getInputStyleClasses = (isError?: string | null) => {
 };
 
 export function statusMessage(status: FulfillmentStatus) {
-  const translations: Record<FulfillmentStatus, string> = {
+  const translations: Record<string, string> = {
     SUCCESS: 'Success',
     PENDING: 'Pending',
     OPEN: 'Open',
@@ -242,8 +230,8 @@ export function statusMessage(status: FulfillmentStatus) {
     CANCELLED: 'Cancelled',
   };
   try {
-    return translations?.[status];
-  } catch (error) {
+    return translations[status] || status;
+  } catch {
     return status;
   }
 }
@@ -282,7 +270,10 @@ export function useIsHomePath() {
   const {pathname} = useLocation();
   const rootData = useRouteLoaderData<RootLoader>('root');
   const selectedLocale = rootData?.selectedLocale ?? DEFAULT_LOCALE;
-  const strippedPathname = pathname.replace(selectedLocale.pathPrefix, '');
+  const strippedPathname = pathname.replace(
+    selectedLocale?.pathPrefix || '',
+    '',
+  );
   return strippedPathname === '/';
 }
 
@@ -293,22 +284,49 @@ export function parseAsCurrency(value: number, locale: I18nLocale) {
   }).format(value);
 }
 
-/**
- * Validates that a url is local
- * @param url
- * @returns `true` if local `false`if external domain
- */
 export function isLocalPath(url: string) {
   try {
-    // We don't want to redirect cross domain,
-    // doing so could create fishing vulnerability
-    // If `new URL()` succeeds, it's a fully qualified
-    // url which is cross domain. If it fails, it's just
-    // a path, which will be the current domain.
     new URL(url);
-  } catch (e) {
+  } catch {
     return true;
   }
-
   return false;
 }
+
+export function parseSync(data: any) {
+  try {
+    return JSON.parse(JSON.stringify(data));
+  } catch {
+    return data;
+  }
+}
+
+/*
+  Define the fragments so Hydrogen Codegen can export the types
+  ChildMenuItemFragment, MenuFragment, ParentMenuItemFragment
+*/
+const _MENU_FRAGMENT = `#graphql
+  fragment MenuItem on MenuItem {
+    id
+    resourceId
+    tags
+    title
+    type
+    url
+  }
+  fragment ChildMenuItem on MenuItem {
+    ...MenuItem
+  }
+  fragment ParentMenuItem on MenuItem {
+    ...MenuItem
+    items {
+      ...ChildMenuItem
+    }
+  }
+  fragment Menu on Menu {
+    id
+    items {
+      ...ParentMenuItem
+    }
+  }
+`;

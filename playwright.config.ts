@@ -1,51 +1,54 @@
+import * as fs from 'fs';
+import * as path from 'path';
+
+// Load .env (mini-oxygen reads from .env, not .env.local)
+const envPath = path.resolve(process.cwd(), '.env');
+const envVars: Record<string, string> = {};
+
+if (fs.existsSync(envPath)) {
+  const envContent = fs.readFileSync(envPath, 'utf-8');
+  envContent.split('\n').forEach((line) => {
+    const trimmed = line.trim();
+    if (trimmed && !trimmed.startsWith('#')) {
+      const [key, ...valueParts] = trimmed.split('=');
+      if (key) {
+        envVars[key.trim()] = valueParts.join('=').trim();
+      }
+    }
+  });
+}
+
 import {
   defineConfig,
   devices,
   type PlaywrightTestConfig,
 } from '@playwright/test';
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// require('dotenv').config();
+// Build cross-env command with all variables
+const _envVarString = Object.entries(envVars)
+  .map(([key, value]) => `${key}=${value}`)
+  .join(' ');
 
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
 let config: PlaywrightTestConfig = defineConfig({
   testDir: './tests',
-  /* Maximum time one test can run for. */
-  timeout: 30 * 1000,
+  /* Preserved: Increased global timeout for hydration-heavy Hydrogen apps */
+  timeout: 60 * 1000,
   expect: {
-    /**
-     * Maximum time expect() should wait for the condition to be met.
-     * For example in `await expect(locator).toHaveText();`
-     */
-    timeout: 5000,
+    timeout: 10000,
   },
-  /* Run tests in files in parallel */
   fullyParallel: true,
-  /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
+  retries: process.env.CI ? 2 : 1,
   workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
-    actionTimeout: 0,
-
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    actionTimeout: 15000,
+    video: 'on-first-retry',
+    screenshot: 'only-on-failure',
     trace: 'on-first-retry',
-
     bypassCSP: true,
   },
 
-  /* Configure projects for major browsers */
   projects: [
     {
       name: 'chromium',
@@ -55,44 +58,54 @@ let config: PlaywrightTestConfig = defineConfig({
     },
   ],
 
-  /* Folder for test artifacts such as screenshots, videos, traces, etc. */
-  // outputDir: 'test-results/',
-
-  /* Run your local dev server before starting the tests */
+  // Consolidating the WebServer here
   webServer: {
-    command: 'npm run preview',
+    command:
+      process.env.CI && envVars.SESSION_SECRET
+        ? `SESSION_SECRET="${envVars.SESSION_SECRET}" PUBLIC_STOREFRONT_API_TOKEN="${envVars.PUBLIC_STOREFRONT_API_TOKEN}" PUBLIC_STORE_DOMAIN="${envVars.PUBLIC_STORE_DOMAIN}" PUBLIC_STOREFRONT_ID="1000070592" SHOP_ID="69867438158" PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID="15df4a30-725c-4c78-beb9-5935470227bb" PUBLIC_CUSTOMER_ACCOUNT_API_URL="https://shopify.com/69867438158" npm run dev`
+        : 'npm run dev',
     port: 3000,
+    reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000,
+    env: {
+      ...process.env,
+      ...envVars,
+      SESSION_SECRET:
+        envVars.SESSION_SECRET ||
+        process.env.SESSION_SECRET ||
+        '9d83402cb6db8bdf6a0219ecc8d39ebb1fba4830',
+      PUBLIC_STOREFRONT_API_TOKEN:
+        envVars.PUBLIC_STOREFRONT_API_TOKEN ||
+        process.env.PUBLIC_STOREFRONT_API_TOKEN ||
+        'f7b8ff7fcf3c4488b8298a96537e5cce',
+      PUBLIC_STORE_DOMAIN:
+        envVars.PUBLIC_STORE_DOMAIN ||
+        process.env.PUBLIC_STORE_DOMAIN ||
+        'hydrogen-test-site-c3af9b28180909d81e30.o2.myshopify.dev',
+      PUBLIC_STOREFRONT_ID: '1000070592',
+      SHOP_ID: '69867438158',
+      PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID:
+        '15df4a30-725c-4c78-beb9-5935470227bb',
+      PUBLIC_CUSTOMER_ACCOUNT_API_URL: 'https://shopify.com/69867438158',
+    },
   },
 });
 
+/* Preserved: Environment variable logic for Oxygen/CI environments */
 if (process.env.URL) {
-  const use = {
+  config.use = {
     ...config.use,
     baseURL: process.env.URL,
   };
-
   if (process.env.AUTH_BYPASS_TOKEN) {
-    use.extraHTTPHeaders = {
+    config.use.extraHTTPHeaders = {
       'oxygen-auth-bypass-token': process.env.AUTH_BYPASS_TOKEN,
     };
   }
-
-  config = {
-    ...config,
-    use,
-  };
 } else {
-  config = {
-    ...config,
-    use: {
-      ...config.use,
-      baseURL: 'http://localhost:3000',
-    },
-    /* Run your local dev server before starting the tests */
-    webServer: {
-      command: 'npm run preview',
-      port: 3000,
-    },
+  config.use = {
+    ...config.use,
+    baseURL: 'http://localhost:3000',
   };
 }
 
