@@ -1,4 +1,5 @@
 import type {HomepageFeaturedProductsQuery} from 'storefrontapi.generated';
+
 import {Section} from '~/components/Text';
 import {ProductCard} from '~/components/ProductCard';
 
@@ -8,13 +9,13 @@ const mockProducts = {
 
 type ProductSwimlaneProps = HomepageFeaturedProductsQuery & {
   title?: string;
-  count?: number;
+  _count?: number;
 };
 
 export function ProductSwimlane({
   title = 'Featured Products',
   products = mockProducts,
-  count = 12,
+  _count = 12,
   ...props
 }: ProductSwimlaneProps) {
   return (

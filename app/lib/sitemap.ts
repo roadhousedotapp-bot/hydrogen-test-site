@@ -1,6 +1,8 @@
 import type {LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import type {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   CountryCode,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   LanguageCode,
 } from '@shopify/hydrogen/storefront-api-types';
 
@@ -12,6 +14,7 @@ const SITEMAP_PREFIX = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">`;
 const SITEMAP_SUFFIX = `</urlset>`;
 
+// eslint-disable-next-line no-unused-vars
 type Locale = `${LanguageCode}-${CountryCode}`;
 
 type SITEMAP_INDEX_TYPE =
@@ -74,7 +77,7 @@ interface GetSiteMapOptions {
   /** A Remix Request object */
   request: Request;
   /** A function that produces a canonical url for a resource. It is called multiple times for each locale supported by the app. */
-  getLink: (options: {
+  getLink: (_options: {
     type: string | SITEMAP_INDEX_TYPE;
     baseUrl: string;
     handle?: string;
@@ -83,7 +86,7 @@ interface GetSiteMapOptions {
   /** An array of locales to generate alternate tags */
   locales: string[];
   /** Optionally customize the changefreq property for each URL */
-  getChangeFreq?: (options: {
+  getChangeFreq?: (_options: {
     type: string | SITEMAP_INDEX_TYPE;
     handle: string;
   }) => string;
@@ -172,7 +175,7 @@ function renderUrlTag({
   baseUrl: string;
   handle: string;
   metaobjectType?: string;
-  getLink: (options: {
+  getLink: (_options: {
     type: string;
     baseUrl: string;
     handle?: string;
@@ -181,7 +184,7 @@ function renderUrlTag({
   url: string;
   updatedAt: string;
   locales: string[];
-  getChangeFreq?: (options: {type: string; handle: string}) => string;
+  getChangeFreq?: (_options: {type: string; handle: string}) => string;
 }) {
   return `<url>
   <loc>${url}</loc>

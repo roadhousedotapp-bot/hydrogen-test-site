@@ -1,6 +1,6 @@
 import {test, expect} from '@playwright/test';
 
-import {formatPrice, normalizePrice} from './utils';
+import {normalizePrice} from './utils';
 
 test.describe('Cart Flow', () => {
   test.beforeEach(async ({page}) => {

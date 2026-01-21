@@ -3,8 +3,8 @@ import useWindowScroll from 'react-use/esm/useWindowScroll';
 import {Disclosure} from '@headlessui/react';
 import {Suspense, useEffect, useMemo} from 'react';
 import {CartForm} from '@shopify/hydrogen';
-
 import type {LayoutQuery} from 'storefrontapi.generated';
+
 import {Text, Heading, Section} from '~/components/Text';
 import {Link} from '~/components/Link';
 import {Cart} from '~/components/Cart';
@@ -505,7 +505,7 @@ function FooterMenu({menu}: {menu?: EnhancedMenu}) {
 }
 
 // Ensure this query remains at the bottom so Codegen finds it!
-const LAYOUT_QUERY = `#graphql
+const _LAYOUT_QUERY = `#graphql
   query Layout(
     $headerMenuHandle: String!
     $footerMenuHandle: String!

@@ -54,3 +54,13 @@ declare module '@shopify/remix-oxygen' {
 
 // Needed to make this file a module.
 export {};
+
+process.env.SESSION_SECRET = '9d83402cb6db8bdf6a0219ecc8d39ebb1fba4830';
+process.env.PUBLIC_STOREFRONT_API_TOKEN = 'f7b8ff7fcf3c4488b8298a96537e5cce';
+process.env.PUBLIC_STORE_DOMAIN =
+  'hydrogen-test-site-c3af9b28180909d81e30.o2.myshopify.dev';
+process.env.PUBLIC_STOREFRONT_ID = '1000070592';
+process.env.SHOP_ID = '69867438158';
+process.env.PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID =
+  '15df4a30-725c-4c78-beb9-5935470227bb';
+process.env.PUBLIC_CUSTOMER_ACCOUNT_API_URL = 'https://shopify.com/69867438158';

@@ -13,7 +13,6 @@ import {json} from '@shopify/remix-oxygen';
 
 import styles from '~/styles/app.css?url';
 import {GoogleTagManager} from '~/components/GoogleTagManager';
-import {DEFAULT_LOCALE, parseSync} from '~/lib/utils';
 
 export const links: LinksFunction = () => [{rel: 'stylesheet', href: styles}];
 
@@ -56,7 +55,6 @@ export default function App() {
 
 export function ErrorBoundary() {
   const error = useRouteError();
-  const rootData = parseSync(useLoaderData());
 
   if (isRouteErrorResponse(error)) {
     return (

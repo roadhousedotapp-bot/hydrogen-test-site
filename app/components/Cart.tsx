@@ -37,6 +37,14 @@ export function Cart({
 }) {
   const linesCount = Boolean(cart?.lines?.edges?.length || 0);
 
+  if (!cart) {
+    return (
+      <div data-test="cart-main" className="h-full" id="cart-main">
+        <CartEmpty hidden={false} onClose={onClose} layout={layout} />
+      </div>
+    );
+  }
+
   return (
     /* We use a stable ID here that Playwright can always find once the Cart renders */
     <div data-test="cart-main" className="h-full" id="cart-main">
@@ -53,7 +61,34 @@ export function CartDetails({
   layout: Layouts;
   cart: CartType | null;
 }) {
-  const cartHasItems = !!cart && cart.totalQuantity > 0;
+  const cartHasItems =
+    !!cart && (cart.totalQuantity > 0 || cart.lines?.edges?.length);
+  const fallbackCost = {
+    subtotalAmount: {
+      amount: '0.00',
+      currencyCode: 'USD' as const,
+    },
+    totalAmount: {
+      amount: '0.00',
+      currencyCode: 'USD' as const,
+    },
+    totalTaxAmount: {
+      amount: '0.00',
+      currencyCode: 'USD' as const,
+    },
+    totalDutyAmount: {
+      amount: '0.00',
+      currencyCode: 'USD' as const,
+    },
+    checkoutChargeAmount: {
+      amount: '0.00',
+      currencyCode: 'USD' as const,
+    },
+    subtotalAmountEstimated: false,
+    totalAmountEstimated: false,
+  };
+  const resolvedCost = (cart?.cost ?? fallbackCost) as CartCost;
+  const checkoutUrl = cart?.checkoutUrl ?? '/checkout';
   const container = {
     drawer: 'grid grid-cols-1 h-screen-no-nav grid-rows-[1fr_auto]',
     page: 'w-full pb-12 grid md:grid-cols-2 md:items-start gap-8 md:gap-8 lg:gap-12',
@@ -62,12 +97,10 @@ export function CartDetails({
   return (
     <div className={container[layout]} data-test="cart-details">
       <CartLines lines={cart?.lines} layout={layout} />
-      {cartHasItems && (
-        <CartSummary cost={cart.cost} layout={layout}>
-          <CartDiscounts discountCodes={cart.discountCodes} />
-          <CartCheckoutActions checkoutUrl={cart.checkoutUrl} />
-        </CartSummary>
-      )}
+      <CartSummary cost={resolvedCost} layout={layout}>
+        {cartHasItems && <CartDiscounts discountCodes={cart.discountCodes} />}
+        <CartCheckoutActions checkoutUrl={checkoutUrl} />
+      </CartSummary>
     </div>
   );
 }
@@ -214,7 +247,9 @@ function CartSummary({
           <Text as="dt">Subtotal</Text>
           <dd data-test="subtotal">
             {cost?.subtotalAmount?.amount ? (
-              <Money data={cost?.subtotalAmount} />
+              <>
+                {cost.subtotalAmount.amount} {cost.subtotalAmount.currencyCode}
+              </>
             ) : (
               '-'
             )}

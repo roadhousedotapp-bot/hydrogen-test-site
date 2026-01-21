@@ -1,6 +1,6 @@
 import {flattenConnection, Image} from '@shopify/hydrogen';
-
 import type {OrderCardFragment} from 'customer-accountapi.generated';
+
 import {Heading, Text} from '~/components/Text';
 import {Link} from '~/components/Link';
 import {statusMessage} from '~/lib/utils';

@@ -103,7 +103,6 @@ export async function loader({params, request, context}: LoaderFunctionArgs) {
         );
       });
       if (!foundValue) {
-        // eslint-disable-next-line no-console
         console.error('Could not find filter value for filter', filter);
         return null;
       }
@@ -164,7 +163,7 @@ export default function Collection() {
         <SortFilter
           filters={collection.products.filters as Filter[]}
           appliedFilters={appliedFilters}
-          collections={collections}
+          _collections={collections}
         >
           <Pagination connection={collection.products}>
             {({

@@ -33,7 +33,7 @@ type Props = {
   filters: Filter[];
   appliedFilters?: AppliedFilter[];
   children: React.ReactNode;
-  collections?: Array<{handle: string; title: string}>;
+  _collections?: Array<{handle: string; title: string}>;
 };
 export const FILTER_URL_PREFIX = 'filter.';
 
@@ -41,7 +41,7 @@ export function SortFilter({
   filters,
   appliedFilters = [],
   children,
-  collections = [],
+  _collections = [],
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   return (

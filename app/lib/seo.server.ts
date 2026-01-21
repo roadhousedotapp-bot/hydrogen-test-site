@@ -10,7 +10,6 @@ import type {
   Image,
 } from '@shopify/hydrogen/storefront-api-types';
 import type {BreadcrumbList, CollectionPage, Offer} from 'schema-dts';
-
 import type {ShopFragment} from 'storefrontapi.generated';
 
 function root({
@@ -472,7 +471,7 @@ function truncate(str: string, num = 155): string {
   return str.slice(0, num - 3) + '...';
 }
 
-const SHOP_FRAGMENT = `#graphql
+const _SHOP_FRAGMENT = `#graphql
   fragment Shop on Shop {
     name
     description

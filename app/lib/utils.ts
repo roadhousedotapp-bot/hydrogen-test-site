@@ -2,16 +2,16 @@ import {useLocation, useRouteLoaderData} from '@remix-run/react';
 import type {MoneyV2} from '@shopify/hydrogen/storefront-api-types';
 import type {FulfillmentStatus} from '@shopify/hydrogen/customer-account-api-types';
 import typographicBase from 'typographic-base';
-
 import type {
   ChildMenuItemFragment,
   MenuFragment,
   ParentMenuItemFragment,
 } from 'storefrontapi.generated';
-import type {loader} from '~/root';
-import {countries} from '~/data/countries';
 
 import type {I18nLocale} from './type';
+
+import type {loader} from '~/root';
+import {countries} from '~/data/countries';
 
 type RootLoader = typeof loader;
 
@@ -154,7 +154,6 @@ function parseItem(primaryDomain: string, env: Env, customPrefixes = {}) {
     | EnhancedMenu['items'][number]['items'][0]
     | null {
     if (!item?.url || !item?.type) {
-      // eslint-disable-next-line no-console
       console.warn('Invalid menu item. Must include a url and type.');
       return null;
     }
@@ -198,7 +197,6 @@ export function parseMenu(
   customPrefixes = {},
 ): EnhancedMenu | null {
   if (!menu?.items) {
-    // eslint-disable-next-line no-console
     console.warn('Invalid menu passed to parseMenu');
     return null;
   }
@@ -233,7 +231,7 @@ export function statusMessage(status: FulfillmentStatus) {
   };
   try {
     return translations[status] || status;
-  } catch (error) {
+  } catch {
     return status;
   }
 }
@@ -289,7 +287,7 @@ export function parseAsCurrency(value: number, locale: I18nLocale) {
 export function isLocalPath(url: string) {
   try {
     new URL(url);
-  } catch (e) {
+  } catch {
     return true;
   }
   return false;
@@ -307,7 +305,7 @@ export function parseSync(data: any) {
   Define the fragments so Hydrogen Codegen can export the types
   ChildMenuItemFragment, MenuFragment, ParentMenuItemFragment
 */
-const MENU_FRAGMENT = `#graphql
+const _MENU_FRAGMENT = `#graphql
   fragment MenuItem on MenuItem {
     id
     resourceId
