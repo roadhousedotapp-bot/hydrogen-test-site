@@ -60,7 +60,9 @@ let config: PlaywrightTestConfig = defineConfig({
 
   // Consolidating the WebServer here
   webServer: {
-    command: 'npm run dev',
+    command: process.env.CI && envVars.SESSION_SECRET
+      ? `SESSION_SECRET="${envVars.SESSION_SECRET}" PUBLIC_STOREFRONT_API_TOKEN="${envVars.PUBLIC_STOREFRONT_API_TOKEN}" PUBLIC_STORE_DOMAIN="${envVars.PUBLIC_STORE_DOMAIN}" PUBLIC_STOREFRONT_ID="1000070592" SHOP_ID="69867438158" PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID="15df4a30-725c-4c78-beb9-5935470227bb" PUBLIC_CUSTOMER_ACCOUNT_API_URL="https://shopify.com/69867438158" npm run dev`
+      : 'npm run dev',
     port: 3000,
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
