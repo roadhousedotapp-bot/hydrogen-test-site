@@ -41,20 +41,31 @@ runs:
         key: turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}
         restore-keys: |
           turbo-${{ github.job }}-${{ github.ref_name }}-
-
+    - name: 🔧 Create .env.local with secrets
+      shell: 'bash'
+      run: |
+        cat > .env.local << EOF
+        PUBLIC_STORE_DOMAIN=${{ inputs.public-store-domain }}
+        PUBLIC_STOREFRONT_API_TOKEN=${{ inputs.public-storefront-api-token }}
+        SESSION_SECRET=${{ inputs.session-secret }}
+        PUBLIC_STOREFRONT_ID=1000070592
+        SHOP_ID=69867438158
+        PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID=15df4a30-725c-4c78-beb9-5935470227bb
+        PUBLIC_CUSTOMER_ACCOUNT_API_URL=https://shopify.com/69867438158
+        EOF
     - name: � Install Playwright Browsers
       shell: 'bash'
       run: npx playwright install --with-deps chromium
 
     - name: 🍄 Run Playwright tests
       shell: 'bash'
-      run: |
-        URL=${{ inputs.url }} \
-        AUTH_BYPASS_TOKEN=${{ inputs.auth-bypass-token }} \
-        PUBLIC_STORE_DOMAIN=${{ inputs.public-store-domain }} \
-        PUBLIC_STOREFRONT_API_TOKEN=${{ inputs.public-storefront-api-token }} \
-        SESSION_SECRET=${{ inputs.session-secret }} \
-        npx playwright test
+      env:
+        URL: ${{ inputs.url }}
+        AUTH_BYPASS_TOKEN: ${{ inputs.auth-bypass-token }}
+        PUBLIC_STORE_DOMAIN: ${{ inputs.public-store-domain }}
+        PUBLIC_STOREFRONT_API_TOKEN: ${{ inputs.public-storefront-api-token }}
+        SESSION_SECRET: ${{ inputs.session-secret }}
+      run: npx playwright test
 
     - name: 🗒 Report
       uses: actions/upload-artifact@v4
