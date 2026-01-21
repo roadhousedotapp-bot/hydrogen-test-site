@@ -1,10 +1,4 @@
-type Props = {
-  gtmId?: string;
-};
-
-export function GoogleTagManager({gtmId}: Props) {
-  if (!gtmId) return null;
-
+export function GoogleTagManager() {
   return (
     <script
       dangerouslySetInnerHTML={{
@@ -16,7 +10,7 @@ export function GoogleTagManager({gtmId}: Props) {
           j.async=true;j.src=
           'https://www.googletagmanager.com/gtm.js?id='+i+dl;
           f.parentNode.insertBefore(j,f);
-          })(window,document,'script','dataLayer','${gtmId}');
+          })(window,document,'script','dataLayer','GTM-5P9R6MP8');
         `,
       }}
     />
