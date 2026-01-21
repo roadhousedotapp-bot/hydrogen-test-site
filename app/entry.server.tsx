@@ -12,30 +12,22 @@ export default async function handleRequest(
   context: AppLoadContext,
 ) {
   const {nonce, header, NonceProvider} = createContentSecurityPolicy({
-    imgSrc: [
-      "'self'",
-      'https://cdn.shopify.com',
-      'https://*.google-analytics.com',
-      'https://*.googletagmanager.com',
-    ],
-    connectSrc: [
-      "'self'",
-      'https://*.google-analytics.com',
-      'https://*.analytics.google.com',
-      'https://*.googletagmanager.com',
-    ],
     shop: {
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
       storeDomain: context.env.PUBLIC_STORE_DOMAIN,
     },
     scriptSrc: [
-      'self',
+      "'self'",
       'https://cdn.shopify.com',
-      'https://shopify.com',
-      'https://*.google-analytics.com',
-      'https://*.googletagmanager.com',
-      ...(process.env.NODE_ENV !== 'production' ? ['http://localhost:*'] : []),
-    ],
+      'https://www.googletagmanager.com',
+      'https://www.google-analytics.com',
+    ] as const,
+    imgSrc: [
+      "'self'",
+      'https://cdn.shopify.com',
+      'https://www.google-analytics.com',
+    ] as const,
+    connectSrc: ["'self'", 'https://www.google-analytics.com'] as const,
   });
 
   const body = await renderToReadableStream(
@@ -58,6 +50,7 @@ export default async function handleRequest(
 
   responseHeaders.set('Content-Type', 'text/html');
   responseHeaders.set('Content-Security-Policy', header);
+
   return new Response(body, {
     headers: responseHeaders,
     status: responseStatusCode,

@@ -10,7 +10,9 @@ import {Heading} from '~/components/Text';
 import {IconCheck} from '~/components/Icon';
 import type {Localizations, Locale} from '~/lib/type';
 import {DEFAULT_LOCALE} from '~/lib/utils';
-import type {RootLoader} from '~/root';
+import type {loader} from '~/root';
+
+type RootLoader = typeof loader;
 
 export function CountrySelector() {
   const fetcher = useFetcher();

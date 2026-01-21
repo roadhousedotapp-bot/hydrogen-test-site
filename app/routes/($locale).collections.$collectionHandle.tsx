@@ -163,7 +163,7 @@ export default function Collection() {
         <SortFilter
           filters={collection.products.filters as Filter[]}
           appliedFilters={appliedFilters}
-          collections={collections}
+          _collections={collections}
         >
           <Pagination connection={collection.products}>
             {({

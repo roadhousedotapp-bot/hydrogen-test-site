@@ -9,13 +9,13 @@ const mockProducts = {
 
 type ProductSwimlaneProps = HomepageFeaturedProductsQuery & {
   title?: string;
-  count?: number;
+  _count?: number;
 };
 
 export function ProductSwimlane({
   title = 'Featured Products',
   products = mockProducts,
-  count: _count = 12,
+  _count = 12,
   ...props
 }: ProductSwimlaneProps) {
   return (

@@ -12,7 +12,8 @@ const SITEMAP_PREFIX = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">`;
 const SITEMAP_SUFFIX = `</urlset>`;
 
-type _Locale = `${LanguageCode}-${CountryCode}`;
+// eslint-disable-next-line no-unused-vars
+type Locale = `${LanguageCode}-${CountryCode}`;
 
 type SITEMAP_INDEX_TYPE =
   | 'pages'

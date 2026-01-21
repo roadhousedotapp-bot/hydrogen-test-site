@@ -11,7 +11,7 @@ import {Hero} from '~/components/Hero';
 import {FeaturedCollections} from '~/components/FeaturedCollections';
 import {ProductSwimlane} from '~/components/ProductSwimlane';
 import {MEDIA_FRAGMENT, PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
-import {getHeroPlaceholder} from '~/lib/placeholders';
+import {getHeroPlaceholder, getProductPlaceholder} from '~/lib/placeholders';
 import {seoPayload} from '~/lib/seo.server';
 import {routeHeaders} from '~/data/cache';
 
@@ -44,18 +44,33 @@ export async function loader(args: LoaderFunctionArgs) {
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  */
 async function loadCriticalData({context, request}: LoaderFunctionArgs) {
-  const [{shop, hero}] = await Promise.all([
-    context.storefront.query(HOMEPAGE_SEO_QUERY, {
-      variables: {handle: 'freestyle'},
-    }),
-    // Add other queries here, so that they are loaded in parallel
-  ]);
+  try {
+    const [{shop, hero}] = await Promise.all([
+      context.storefront.query(HOMEPAGE_SEO_QUERY, {
+        variables: {handle: 'freestyle'},
+      }),
+      // Add other queries here, so that they are loaded in parallel
+    ]);
 
-  return {
-    shop,
-    primaryHero: hero,
-    seo: seoPayload.home({url: request.url}),
-  };
+    return {
+      shop,
+      primaryHero: hero,
+      seo: seoPayload.home({url: request.url}),
+    };
+  } catch (error) {
+    console.error(error);
+
+    const [primaryHero] = getHeroPlaceholder([{}]).map(withMediaTypenames);
+
+    return {
+      shop: {
+        name: 'Hydrogen Demo',
+        description: 'Fallback content',
+      },
+      primaryHero,
+      seo: seoPayload.home({url: request.url}),
+    };
+  }
 }
 
 /**
@@ -65,6 +80,9 @@ async function loadCriticalData({context, request}: LoaderFunctionArgs) {
  */
 function loadDeferredData({context}: LoaderFunctionArgs) {
   const {language, country} = context.storefront.i18n;
+
+  const heroPlaceholders = getHeroPlaceholder([{}, {}, {}]);
+  const placeholderProduct = getProductPlaceholder();
 
   const featuredProducts = context.storefront
     .query(HOMEPAGE_FEATURED_PRODUCTS_QUERY, {
@@ -79,10 +97,17 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
       },
     })
     .catch((error) => {
-      // Log query errors, but don't throw them so the page can still render
-
       console.error(error);
-      return null;
+
+      return {
+        products: {
+          nodes: Array.from({length: 4}).map((_, index) => ({
+            ...placeholderProduct,
+            id: `${placeholderProduct.id}-${index}`,
+            handle: placeholderProduct.handle || `placeholder-product-${index}`,
+          })),
+        },
+      };
     });
 
   const secondaryHero = context.storefront
@@ -94,10 +119,8 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
       },
     })
     .catch((error) => {
-      // Log query errors, but don't throw them so the page can still render
-
       console.error(error);
-      return null;
+      return {hero: withMediaTypenames(heroPlaceholders[1])};
     });
 
   const featuredCollections = context.storefront
@@ -108,10 +131,33 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
       },
     })
     .catch((error) => {
-      // Log query errors, but don't throw them so the page can still render
-
       console.error(error);
-      return null;
+
+      const collectionFallbacks = heroPlaceholders.map((hero, index) => {
+        const heroWithTypes = withMediaTypenames(hero);
+        const heroImage = heroWithTypes?.spread?.reference?.image;
+        return {
+          id: heroWithTypes?.id || `placeholder-collection-${index}`,
+          title: heroWithTypes?.heading?.value || 'Collection',
+          handle: heroWithTypes?.handle || `collection-${index}`,
+          image: heroImage
+            ? {
+                altText:
+                  heroWithTypes?.spread?.reference?.alt ||
+                  'Placeholder collection image',
+                width: heroImage.width || 1200,
+                height: heroImage.height || 1200,
+                url: heroImage.url,
+              }
+            : null,
+        };
+      });
+
+      return {
+        collections: {
+          nodes: collectionFallbacks,
+        },
+      };
     });
 
   const tertiaryHero = context.storefront
@@ -123,18 +169,46 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
       },
     })
     .catch((error) => {
-      // Log query errors, but don't throw them so the page can still render
-
       console.error(error);
-      return null;
+      return {hero: withMediaTypenames(heroPlaceholders[2])};
     });
-
   return {
     featuredProducts,
     secondaryHero,
     featuredCollections,
     tertiaryHero,
   };
+}
+
+function withMediaTypenames(hero: any) {
+  if (!hero) return hero;
+
+  const heroClone = {...hero};
+
+  if (heroClone.spread?.reference && !heroClone.spread.reference.__typename) {
+    heroClone.spread = {
+      ...heroClone.spread,
+      reference: {
+        ...heroClone.spread.reference,
+        __typename: 'MediaImage',
+      },
+    };
+  }
+
+  if (
+    heroClone.spreadSecondary?.reference &&
+    !heroClone.spreadSecondary.reference.__typename
+  ) {
+    heroClone.spreadSecondary = {
+      ...heroClone.spreadSecondary,
+      reference: {
+        ...heroClone.spreadSecondary.reference,
+        __typename: 'MediaImage',
+      },
+    };
+  }
+
+  return heroClone;
 }
 
 export const meta = ({matches}: MetaArgs<typeof loader>) => {
@@ -148,7 +222,7 @@ export default function Homepage() {
     tertiaryHero,
     featuredCollections,
     featuredProducts,
-  } = useLoaderData<typeof loader>();
+  } = useLoaderData<typeof loader>() as any;
 
   // TODO: skeletons vs placeholders
   const skeletons = getHeroPlaceholder([{}, {}, {}]);
@@ -174,7 +248,7 @@ export default function Homepage() {
                 <ProductSwimlane
                   products={response.products}
                   title="Featured Products"
-                  count={4}
+                  _count={4}
                 />
               );
             }}
@@ -208,7 +282,7 @@ export default function Homepage() {
               }
               return (
                 <FeaturedCollections
-                  collections={response.collections}
+                  collections={response.collections as any}
                   title="Collections"
                 />
               );

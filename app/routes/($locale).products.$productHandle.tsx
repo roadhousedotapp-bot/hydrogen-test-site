@@ -39,6 +39,7 @@ import {seoPayload} from '~/lib/seo.server';
 import type {Storefront} from '~/lib/type';
 import {routeHeaders} from '~/data/cache';
 import {MEDIA_FRAGMENT, PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
+import {getProductPlaceholder} from '~/lib/placeholders';
 
 export const headers = routeHeaders;
 
@@ -68,41 +69,70 @@ async function loadCriticalData({
   invariant(productHandle, 'Missing productHandle param, check route filename');
 
   const selectedOptions = getSelectedProductOptions(request);
+  try {
+    const [{shop, product}] = await Promise.all([
+      context.storefront.query(PRODUCT_QUERY, {
+        variables: {
+          handle: productHandle,
+          selectedOptions,
+          country: context.storefront.i18n.country,
+          language: context.storefront.i18n.language,
+        },
+      }),
+      // Add other queries here, so that they are loaded in parallel
+    ]);
 
-  const [{shop, product}] = await Promise.all([
-    context.storefront.query(PRODUCT_QUERY, {
-      variables: {
-        handle: productHandle,
-        selectedOptions,
-        country: context.storefront.i18n.country,
-        language: context.storefront.i18n.language,
-      },
-    }),
-    // Add other queries here, so that they are loaded in parallel
-  ]);
+    if (!product?.id) {
+      throw new Response('product', {status: 404});
+    }
 
-  if (!product?.id) {
-    throw new Response('product', {status: 404});
+    const recommended = getRecommendedProducts(context.storefront, product.id);
+    const selectedVariant = product.selectedOrFirstAvailableVariant ?? {};
+    const variants = getAdjacentAndFirstAvailableVariants(product);
+
+    const seo = seoPayload.product({
+      product: {...product, variants},
+      selectedVariant,
+      url: request.url,
+    });
+
+    return {
+      product,
+      variants,
+      shop,
+      storeDomain: shop.primaryDomain.url,
+      recommended,
+      seo,
+    };
+  } catch (error) {
+    console.error('Product loader failed, using placeholder', error);
+
+    const product = buildProductFallback(productHandle);
+    const variants = getAdjacentAndFirstAvailableVariants(product);
+    const selectedVariant = product.selectedOrFirstAvailableVariant ?? {};
+    const recommended = Promise.resolve({nodes: [product]});
+    const shop = {
+      name: 'Hydrogen Demo',
+      primaryDomain: {url: 'https://hydrogen.shop'},
+      shippingPolicy: null,
+      refundPolicy: null,
+    } as const;
+
+    const seo = seoPayload.product({
+      product: {...product, variants},
+      selectedVariant,
+      url: request.url,
+    });
+
+    return {
+      product,
+      variants,
+      shop,
+      storeDomain: shop.primaryDomain.url,
+      recommended,
+      seo,
+    };
   }
-
-  const recommended = getRecommendedProducts(context.storefront, product.id);
-  const selectedVariant = product.selectedOrFirstAvailableVariant ?? {};
-  const variants = getAdjacentAndFirstAvailableVariants(product);
-
-  const seo = seoPayload.product({
-    product: {...product, variants},
-    selectedVariant,
-    url: request.url,
-  });
-
-  return {
-    product,
-    variants,
-    shop,
-    storeDomain: shop.primaryDomain.url,
-    recommended,
-    seo,
-  };
 }
 
 /**
@@ -198,7 +228,10 @@ export default function Product() {
           resolve={recommended}
         >
           {(products) => (
-            <ProductSwimlane title="Related Products" products={products} />
+            <ProductSwimlane
+              title="Related Products"
+              products={products as any}
+            />
           )}
         </Await>
       </Suspense>
@@ -636,4 +669,71 @@ async function getRecommendedProducts(
   mergedProducts.splice(originalProduct, 1);
 
   return {nodes: mergedProducts};
+}
+
+function buildProductFallback(productHandle?: string) {
+  const placeholder = getProductPlaceholder();
+  const firstVariant = placeholder?.variants?.nodes?.[0];
+  const enrichedVariant = firstVariant
+    ? {
+        ...firstVariant,
+        selectedOptions: firstVariant.selectedOptions ?? [],
+        availableForSale: firstVariant.availableForSale ?? true,
+      }
+    : null;
+  const optionValues = placeholder?.options?.map((option) => ({
+    name: option.name,
+    optionValues: (option as any).optionValues
+      ? (option as any).optionValues
+      : option.values.map((value: string) => ({
+          name: value,
+          firstSelectableVariant: enrichedVariant,
+          swatch: null,
+        })),
+  }));
+
+  if (enrichedVariant) {
+    enrichedVariant.selectedOptions =
+      enrichedVariant.selectedOptions.length > 0
+        ? enrichedVariant.selectedOptions
+        : optionValues?.map((option) => ({
+            name: option.name,
+            value: option.optionValues?.[0]?.name ?? '',
+          })) ?? [];
+  }
+  const mediaImage = enrichedVariant?.image
+    ? withMediaTypenames({
+        ...enrichedVariant.image,
+        altText: enrichedVariant.image.altText ?? placeholder.title,
+      })
+    : null;
+
+  const product = {
+    ...placeholder,
+    handle: productHandle ?? placeholder.handle,
+    options: optionValues ?? placeholder.options,
+    media: {nodes: mediaImage ? [mediaImage] : []},
+    selectedOrFirstAvailableVariant: enrichedVariant,
+    adjacentVariants: enrichedVariant ? [enrichedVariant] : [],
+  } as unknown as ProductFragment;
+
+  return product;
+}
+
+function withMediaTypenames(media: any) {
+  return {
+    ...media,
+    __typename: media.__typename ?? 'MediaImage',
+    mediaContentType: media.mediaContentType ?? 'IMAGE',
+    previewImage: media.previewImage ?? {
+      url: media.url,
+    },
+    id: media.id ?? media.url,
+    image: media.image ?? {
+      url: media.url,
+      width: media.width ?? 1200,
+      height: media.height ?? 1200,
+      altText: media.altText,
+    },
+  };
 }

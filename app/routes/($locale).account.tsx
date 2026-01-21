@@ -34,11 +34,8 @@ import {CUSTOMER_DETAILS_QUERY} from '~/graphql/customer-account/CustomerDetails
 
 export const headers = routeHeaders;
 
-export async function loader({
-  request: _request,
-  context,
-  params: _params,
-}: LoaderFunctionArgs) {
+// eslint-disable-next-line no-unused-vars
+export async function loader({request, context, params}: LoaderFunctionArgs) {
   const {data, errors} = await context.customerAccount.query(
     CUSTOMER_DETAILS_QUERY,
   );
@@ -73,11 +70,10 @@ export async function loader({
 }
 
 export default function Authenticated() {
-  const data = useLoaderData<typeof loader>() as unknown as AccountType;
+  const data = useLoaderData<typeof loader>();
   const outlet = useOutlet();
   const matches = useMatches();
 
-  // routes that export handle { renderInModal: true }
   const renderOutletInModal = matches.some((match) => {
     const handle = match?.handle as {renderInModal?: boolean};
     return handle?.renderInModal;
@@ -90,7 +86,11 @@ export default function Authenticated() {
           <Modal cancelLink="/account">
             <Outlet context={{customer: data.customer}} />
           </Modal>
-          <Account {...data} />
+          <Account
+            customer={data.customer}
+            heading={data.heading}
+            featuredDataPromise={data.featuredDataPromise}
+          />
         </>
       );
     } else {
@@ -98,7 +98,13 @@ export default function Authenticated() {
     }
   }
 
-  return <Account {...data} />;
+  return (
+    <Account
+      customer={data.customer}
+      heading={data.heading}
+      featuredDataPromise={data.featuredDataPromise}
+    />
+  );
 }
 
 interface AccountType {
@@ -181,7 +187,7 @@ function EmptyOrders() {
 
 function Orders({orders}: OrderCardsProps) {
   return (
-    <ul className="grid grid-flow-row grid-cols-1 gap-2 gap-y-6 md:gap-4 lg:gap-6 false sm:grid-cols-3">
+    <ul className="grid grid-flow-row grid-cols-1 gap-2 gap-y-6 md:gap-4 lg:gap-6 sm:grid-cols-3">
       {orders.map((order) => (
         <OrderCard order={order} key={order.id} />
       ))}

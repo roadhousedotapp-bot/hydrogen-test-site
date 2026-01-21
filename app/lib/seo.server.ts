@@ -9,16 +9,7 @@ import type {
   ShopPolicy,
   Image,
 } from '@shopify/hydrogen/storefront-api-types';
-import type {
-  Article as _SeoArticle,
-  BreadcrumbList,
-  Blog as _SeoBlog,
-  CollectionPage,
-  Offer,
-  Organization as _Organization,
-  Product as _SeoProduct,
-  WebPage as _WebPage,
-} from 'schema-dts';
+import type {BreadcrumbList, CollectionPage, Offer} from 'schema-dts';
 import type {ShopFragment} from 'storefrontapi.generated';
 
 function root({
@@ -472,16 +463,6 @@ export const seoPayload = {
   root,
 };
 
-/**
- * Truncate a string to a given length, adding an ellipsis if it was truncated
- * @param str - The string to truncate
- * @param num - The maximum length of the string
- * @returns The truncated string
- * @example
- * ```js
- * truncate('Hello world', 5) // 'Hello...'
- * ```
- */
 function truncate(str: string, num = 155): string {
   if (typeof str !== 'string') return '';
   if (str.length <= num) {
@@ -489,3 +470,17 @@ function truncate(str: string, num = 155): string {
   }
   return str.slice(0, num - 3) + '...';
 }
+
+const _SHOP_FRAGMENT = `#graphql
+  fragment Shop on Shop {
+    name
+    description
+    brand {
+      logo {
+        image {
+          url
+        }
+      }
+    }
+  }
+`;

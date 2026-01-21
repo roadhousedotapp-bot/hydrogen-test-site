@@ -3,7 +3,7 @@ import useWindowScroll from 'react-use/esm/useWindowScroll';
 import {Disclosure} from '@headlessui/react';
 import {Suspense, useEffect, useMemo} from 'react';
 import {CartForm} from '@shopify/hydrogen';
-import {type LayoutQuery} from 'storefrontapi.generated';
+import type {LayoutQuery} from 'storefrontapi.generated';
 
 import {Text, Heading, Section} from '~/components/Text';
 import {Link} from '~/components/Link';
@@ -27,7 +27,9 @@ import {
 } from '~/lib/utils';
 import {useIsHydrated} from '~/hooks/useIsHydrated';
 import {useCartFetchers} from '~/hooks/useCartFetchers';
-import type {RootLoader} from '~/root';
+import type {loader} from '~/root';
+
+type RootLoader = typeof loader;
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -47,8 +49,8 @@ export function PageLayout({children, layout}: LayoutProps) {
             Skip to content
           </a>
         </div>
-        {headerMenu && layout?.shop.name && (
-          <Header title={layout.shop.name} menu={headerMenu} />
+        {layout?.shop.name && (
+          <Header title={layout.shop.name} menu={headerMenu || undefined} />
         )}
         <main role="main" id="mainContent" className="flex-grow">
           {children}
@@ -113,7 +115,9 @@ function CartDrawer({isOpen, onClose}: {isOpen: boolean; onClose: () => void}) {
       <div className="grid">
         <Suspense fallback={<CartLoading />}>
           <Await resolve={rootData?.cart}>
-            {(cart) => <Cart layout="drawer" onClose={onClose} cart={cart} />}
+            {(cart) => (
+              <Cart layout="drawer" onClose={onClose} cart={cart as any} />
+            )}
           </Await>
         </Suspense>
       </div>
@@ -153,6 +157,7 @@ function MenuMobileNav({
         <span key={item.id} className="block">
           <Link
             to={item.to}
+            data-test="nav-menu-item"
             target={item.target}
             onClick={onClose}
             className={({isActive}) =>
@@ -180,8 +185,6 @@ function MobileHeader({
   openCart: () => void;
   openMenu: () => void;
 }) {
-  // useHeaderStyleFix(containerStyle, setContainerStyle, isHome);
-
   const params = useParams();
 
   return (
@@ -279,6 +282,7 @@ function DesktopHeader({
             <Link
               key={item.id}
               to={item.to}
+              data-test="nav-menu-item"
               target={item.target}
               prefetch="intent"
               className={({isActive}) =>
@@ -349,7 +353,7 @@ function CartCount({
   return (
     <Suspense fallback={<Badge count={0} dark={isHome} openCart={openCart} />}>
       <Await resolve={rootData?.cart}>
-        {(cart) => (
+        {(cart: any) => (
           <Badge
             dark={isHome}
             openCart={openCart}
@@ -413,7 +417,7 @@ function Footer({menu}: {menu?: EnhancedMenu}) {
     ? menu?.items?.length + 1 > 4
       ? 4
       : menu?.items?.length + 1
-    : [];
+    : 0;
 
   return (
     <Section
@@ -499,3 +503,44 @@ function FooterMenu({menu}: {menu?: EnhancedMenu}) {
     </>
   );
 }
+
+// Ensure this query remains at the bottom so Codegen finds it!
+const _LAYOUT_QUERY = `#graphql
+  query Layout(
+    $headerMenuHandle: String!
+    $footerMenuHandle: String!
+    $language: LanguageCode
+    $country: CountryCode
+  ) @inContext(language: $language, country: $country) {
+    shop {
+      name
+      description
+    }
+    headerMenu: menu(handle: $headerMenuHandle) {
+      id
+      items {
+        ...MenuItem
+        items {
+          ...MenuItem
+        }
+      }
+    }
+    footerMenu: menu(handle: $footerMenuHandle) {
+      id
+      items {
+        ...MenuItem
+        items {
+          ...MenuItem
+        }
+      }
+    }
+  }
+  fragment MenuItem on MenuItem {
+    id
+    resourceId
+    tags
+    title
+    type
+    url
+  }
+`;

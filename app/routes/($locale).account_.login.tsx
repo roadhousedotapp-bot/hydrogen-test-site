@@ -1,9 +1,6 @@
 import type {LoaderFunctionArgs} from '@shopify/remix-oxygen';
 
-export async function loader({
-  params: _params,
-  request: _request,
-  context,
-}: LoaderFunctionArgs) {
+// eslint-disable-next-line no-unused-vars
+export async function loader({params, request, context}: LoaderFunctionArgs) {
   return context.customerAccount.login();
 }

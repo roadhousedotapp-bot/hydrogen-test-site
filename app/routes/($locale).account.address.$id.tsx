@@ -1,4 +1,9 @@
-import {json, redirect, type ActionFunction} from '@shopify/remix-oxygen';
+import {
+  json,
+  redirect,
+  type ActionFunction,
+  // AppLoadContext type removed as it's unused
+} from '@shopify/remix-oxygen';
 import {
   Form,
   useActionData,
