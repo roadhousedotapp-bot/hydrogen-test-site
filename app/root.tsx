@@ -38,6 +38,14 @@ export default function App() {
         <GoogleTagManager />
       </head>
       <body>
+        <header style={{backgroundColor: '#f8f8f8', padding: '15px 20px', borderBottom: '1px solid #eee'}}>
+          <nav>
+            {/* Add your navigation links here */}
+            <a href="/" style={{marginRight: '15px', textDecoration: 'none', color: '#333'}}>Home</a>
+            <a href="/products" style={{marginRight: '15px', textDecoration: 'none', color: '#333'}}>Products</a>
+            <a href="/about" style={{textDecoration: 'none', color: '#333'}}>About</a>
+          </nav>
+        </header>
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-5P9R6MP8"
