@@ -131,7 +131,7 @@ export default function OrderRoute() {
                     <td className="w-full py-4 pl-0 pr-3 align-top sm:align-middle max-w-0 sm:w-auto sm:max-w-none">
                       <div className="flex gap-6">
                         {lineItem?.image && (
-                          <div className="w-24 card-image aspect-square">
+                          <div className="w-24 card-image aspect-square" style={{color: 'red'}}>
                             <Image
                               data={lineItem.image}
                               width={96}
