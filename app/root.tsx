@@ -38,6 +38,14 @@ export default function App() {
         <GoogleTagManager />
       </head>
       <body>
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-5P9R6MP8"
+            height="0"
+            width="0"
+            style={{display: 'none', visibility: 'hidden'}}
+          />
+        </noscript>
         <Outlet />
         <ScrollRestoration />
         <Scripts />
