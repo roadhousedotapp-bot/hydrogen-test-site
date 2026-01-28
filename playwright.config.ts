@@ -60,10 +60,21 @@ let config: PlaywrightTestConfig = defineConfig({
 
   // Consolidating the WebServer here
   webServer: {
-    command:
-      process.env.CI && envVars.SESSION_SECRET
-        ? `SESSION_SECRET="${envVars.SESSION_SECRET}" PUBLIC_STOREFRONT_API_TOKEN="${envVars.PUBLIC_STOREFRONT_API_TOKEN}" PUBLIC_STORE_DOMAIN="${envVars.PUBLIC_STORE_DOMAIN}" PUBLIC_STOREFRONT_ID="1000070592" SHOP_ID="69867438158" PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID="15df4a30-725c-4c78-beb9-5935470227bb" PUBLIC_CUSTOMER_ACCOUNT_API_URL="https://shopify.com/69867438158" npm run dev`
-        : 'npm run dev',
+    command: process.env.CI
+      ? `SESSION_SECRET="${
+          envVars.SESSION_SECRET ||
+          process.env.SESSION_SECRET ||
+          '9d83402cb6db8bdf6a0219ecc8d39ebb1fba4830'
+        }" PUBLIC_STOREFRONT_API_TOKEN="${
+          envVars.PUBLIC_STOREFRONT_API_TOKEN ||
+          process.env.PUBLIC_STOREFRONT_API_TOKEN ||
+          'f7b8ff7fcf3c4488b8298a96537e5cce'
+        }" PUBLIC_STORE_DOMAIN="${
+          envVars.PUBLIC_STORE_DOMAIN ||
+          process.env.PUBLIC_STORE_DOMAIN ||
+          'hydrogen-test-site-c3af9b28180909d81e30.o2.myshopify.dev'
+        }" PUBLIC_STOREFRONT_ID="1000070592" SHOP_ID="69867438158" PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID="15df4a30-725c-4c78-beb9-5935470227bb" PUBLIC_CUSTOMER_ACCOUNT_API_URL="https://shopify.com/69867438158" npm run dev`
+      : 'npm run dev',
     port: 3000,
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,

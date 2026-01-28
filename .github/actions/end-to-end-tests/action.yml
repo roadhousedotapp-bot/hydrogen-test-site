@@ -44,6 +44,13 @@ runs:
     - name: 🔧 Create .env with secrets
       shell: 'bash'
       run: |
+        echo "=== Debugging: Checking if secrets are passed ==="
+        if [ -z "${{ inputs.session-secret }}" ]; then
+          echo "ERROR: session-secret input is empty!"
+        else
+          echo "session-secret is set (length: ${#SESSION_SECRET_INPUT})"
+        fi
+
         echo "PUBLIC_STORE_DOMAIN=${{ inputs.public-store-domain }}" > .env
         echo "PUBLIC_STOREFRONT_API_TOKEN=${{ inputs.public-storefront-api-token }}" >> .env
         echo "SESSION_SECRET=${{ inputs.session-secret }}" >> .env
@@ -51,8 +58,8 @@ runs:
         echo "SHOP_ID=69867438158" >> .env
         echo "PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID=15df4a30-725c-4c78-beb9-5935470227bb" >> .env
         echo "PUBLIC_CUSTOMER_ACCOUNT_API_URL=https://shopify.com/69867438158" >> .env
-        echo "=== .env contents ==="
-        cat .env
+        echo "=== .env contents (with sensitive values masked) ==="
+        sed 's/\(SECRET\|TOKEN\)=.*/\1=***MASKED***/g' .env
 
     - name: � Install Playwright Browsers
       shell: 'bash'
