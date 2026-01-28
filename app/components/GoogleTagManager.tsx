@@ -1,6 +1,11 @@
+import {useNonce} from '@shopify/hydrogen';
+
 export function GoogleTagManager() {
+  const nonce = useNonce();
+
   return (
     <script
+      nonce={nonce}
       dangerouslySetInnerHTML={{
         __html: `
           (function(w,d,s,l,i){w[l]=w[l]||[];
