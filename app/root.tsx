@@ -7,16 +7,16 @@ import {
   isRouteErrorResponse,
   useRouteError,
 } from '@remix-run/react';
-import type { LinksFunction, LoaderFunctionArgs } from '@shopify/remix-oxygen';
-import { json } from '@shopify/remix-oxygen';
+import type {LinksFunction, LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import {json} from '@shopify/remix-oxygen';
 
 import styles from '~/styles/app.css?url';
-import { GoogleTagManager } from '~/components/GoogleTagManager';
+import {GoogleTagManager} from '~/components/GoogleTagManager';
 
-export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }];
+export const links: LinksFunction = () => [{rel: 'stylesheet', href: styles}];
 
-export async function loader({ context }: LoaderFunctionArgs) {
-  const { cart, customerAccount, storefront } = context;
+export async function loader({context}: LoaderFunctionArgs) {
+  const {cart, customerAccount, storefront} = context;
 
   const isLoggedIn = await customerAccount.isLoggedIn();
   const cartPromise = cart.get();
@@ -43,7 +43,7 @@ export default function App() {
             src="https://www.googletagmanager.com/ns.html?id=GTM-5P9R6MP8"
             height="0"
             width="0"
-            style={{ display: 'none', visibility: 'hidden' }}
+            style={{display: 'none', visibility: 'hidden'}}
           />
         </noscript>
         <header
@@ -81,7 +81,7 @@ export default function App() {
                 display: 'flex',
               }}
             >
-              <li style={{ marginRight: '20px' }}>
+              <li style={{marginRight: '20px'}}>
                 <a
                   href="/products"
                   style={{
@@ -93,7 +93,7 @@ export default function App() {
                   Products
                 </a>
               </li>
-              <li style={{ marginRight: '20px' }}>
+              <li style={{marginRight: '20px'}}>
                 <a
                   href="/collections"
                   style={{
