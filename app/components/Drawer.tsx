@@ -1,8 +1,8 @@
-import {Fragment, useState} from 'react';
-import {Dialog, Transition} from '@headlessui/react';
+import { Fragment, useState } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
 
-import {Heading} from '~/components/Text';
-import {IconClose} from '~/components/Icon';
+import { Heading } from '~/components/Text';
+import { IconClose } from '~/components/Icon';
 
 /**
  * Drawer component that opens on user click.
@@ -65,7 +65,12 @@ export function Drawer({
                   <header
                     className={`sticky top-0 flex flex-col items-center px-6 sm:px-8 md:px-12 bg-accent-dark text-contrast py-2`}
                   >
-                    <p className="text-sm">Free shipping on orders over $50!</p>
+                    {/* Prettier added hero banner */}
+                    <div className="w-full bg-accent-dark text-contrast text-center py-2">
+                      <p className="text-sm font-medium">
+                        Free shipping on orders over $50!
+                      </p>
+                    </div>
                     <div
                       className={`flex items-center w-full h-nav ${
                         heading ? 'justify-between' : 'justify-end'
