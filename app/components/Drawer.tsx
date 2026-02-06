@@ -65,7 +65,12 @@ export function Drawer({
                   <header
                     className={`sticky top-0 flex flex-col items-center px-6 sm:px-8 md:px-12 bg-accent-dark text-contrast py-2`}
                   >
-                    <p className="text-sm">Free shipping on orders over $50!</p>
+                    {/* Shipping notice banner */}
+                    <div className="w-full text-center">
+                      <p className="text-sm font-medium">
+                        Free shipping on orders over $50!
+                      </p>
+                    </div>
                     <div
                       className={`flex items-center w-full h-nav ${
                         heading ? 'justify-between' : 'justify-end'
