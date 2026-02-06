@@ -63,16 +63,34 @@ export function Drawer({
               >
                 <Dialog.Panel className="w-screen max-w-lg text-left align-middle transition-all transform shadow-xl h-screen-dynamic bg-contrast">
                   <header
-                    className={`sticky top-0 flex flex-col items-center px-6 sm:px-8 md:px-12 bg-accent-dark text-contrast py-2`}
+                    className={`sticky top-0 flex flex-col items-center bg-accent-dark text-contrast`}
                   >
                     {/* Shipping notice banner */}
-                    <div className="w-full text-center">
-                      <p className="text-sm font-medium">
-                        Free shipping on orders over $50!
-                      </p>
+                    <div className="w-full bg-gradient-to-r from-accent-dark via-accent to-accent-dark text-center py-3 px-4 border-b border-contrast/10">
+                      <div className="flex items-center justify-center gap-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="w-5 h-5"
+                        >
+                          <title>Shipping</title>
+                          <rect x="1" y="3" width="15" height="13" />
+                          <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                          <circle cx="5.5" cy="18.5" r="2.5" />
+                          <circle cx="18.5" cy="18.5" r="2.5" />
+                        </svg>
+                        <p className="text-sm font-semibold tracking-wide">
+                          Free shipping on orders over $50!
+                        </p>
+                      </div>
                     </div>
                     <div
-                      className={`flex items-center w-full h-nav ${
+                      className={`flex items-center w-full h-nav px-6 sm:px-8 md:px-12 ${
                         heading ? 'justify-between' : 'justify-end'
                       }`}
                     >
