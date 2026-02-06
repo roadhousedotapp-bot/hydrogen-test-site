@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import {useRef} from 'react';
+import { useRef } from 'react';
 import useScroll from 'react-use/esm/useScroll';
 import {
   flattenConnection,
@@ -17,12 +17,12 @@ import type {
   CartLineUpdateInput,
 } from '@shopify/hydrogen/storefront-api-types';
 
-import {Button} from '~/components/Button';
-import {Text, Heading} from '~/components/Text';
-import {Link} from '~/components/Link';
-import {IconRemove} from '~/components/Icon';
-import {FeaturedProducts} from '~/components/FeaturedProducts';
-import {getInputStyleClasses} from '~/lib/utils';
+import { Button } from '~/components/Button';
+import { Text, Heading } from '~/components/Text';
+import { Link } from '~/components/Link';
+import { IconRemove } from '~/components/Icon';
+import { FeaturedProducts } from '~/components/FeaturedProducts';
+import { getInputStyleClasses } from '~/lib/utils';
 
 type Layouts = 'page' | 'drawer';
 
@@ -113,7 +113,7 @@ function CartDiscounts({
   const codes: string[] =
     discountCodes
       ?.filter((discount) => discount.applicable)
-      ?.map(({code}) => code) || [];
+      ?.map(({ code }) => code) || [];
 
   return (
     <>
@@ -125,7 +125,7 @@ function CartDiscounts({
               <button>
                 <IconRemove
                   aria-hidden="true"
-                  style={{height: 18, marginRight: 4}}
+                  style={{ height: 18, marginRight: 4 }}
                 />
               </button>
             </UpdateDiscountForm>
@@ -138,7 +138,7 @@ function CartDiscounts({
         <div
           className={clsx(
             'flex',
-            'items-center gap-4 justify-between text-copy',
+            'items-center gap-4 justify-between text-copy'
           )}
         >
           <input
@@ -185,12 +185,12 @@ function CartLines({
 }) {
   const currentLines = cartLines ? flattenConnection(cartLines) : [];
   const scrollRef = useRef(null);
-  const {y} = useScroll(scrollRef);
+  const { y } = useScroll(scrollRef);
 
   const className = clsx([
     y > 0 ? 'border-t' : '',
     layout === 'page'
-      ? 'flex-grow md:translate-y-4'
+      ? 'flex-grow md:translate-y-4' // Original styling for page layout
       : 'px-6 pb-6 sm-max:pt-2 overflow-auto transition md:px-12',
   ]);
 
@@ -209,7 +209,7 @@ function CartLines({
   );
 }
 
-function CartCheckoutActions({checkoutUrl}: {checkoutUrl: string}) {
+function CartCheckoutActions({ checkoutUrl }: { checkoutUrl: string }) {
   if (!checkoutUrl) return null;
 
   return (
@@ -261,7 +261,7 @@ function CartSummary({
   );
 }
 
-function CartLineItem({line}: {line: CartLine}) {
+function CartLineItem({ line }: { line: CartLine }) {
   const optimisticData = useOptimisticData<{
     action?: string;
     quantity?: number;
@@ -269,7 +269,7 @@ function CartLineItem({line}: {line: CartLine}) {
 
   if (!line?.id) return null;
 
-  const {id, quantity, merchandise} = line;
+  const { id, quantity, merchandise } = line;
 
   if (typeof quantity === 'undefined' || !merchandise?.product) return null;
 
@@ -329,7 +329,7 @@ function CartLineItem({line}: {line: CartLine}) {
   );
 }
 
-function ItemRemoveButton({lineId}: {lineId: CartLine['id']}) {
+function ItemRemoveButton({ lineId }: { lineId: CartLine['id'] }) {
   return (
     <CartForm
       route="/cart"
@@ -345,19 +345,19 @@ function ItemRemoveButton({lineId}: {lineId: CartLine['id']}) {
         <span className="sr-only">Remove</span>
         <IconRemove aria-hidden="true" />
       </button>
-      <OptimisticInput id={lineId} data={{action: 'remove'}} />
+      <OptimisticInput id={lineId} data={{ action: 'remove' }} />
     </CartForm>
   );
 }
 
-function CartLineQuantityAdjust({line}: {line: CartLine}) {
+function CartLineQuantityAdjust({ line }: { line: CartLine }) {
   const optimisticId = line?.id;
-  const optimisticData = useOptimisticData<{quantity?: number}>(optimisticId);
+  const optimisticData = useOptimisticData<{ quantity?: number }>(optimisticId);
 
   if (!line || typeof line?.quantity === 'undefined') return null;
 
   const optimisticQuantity = optimisticData?.quantity || line.quantity;
-  const {id: lineId} = line;
+  const { id: lineId } = line;
   const prevQuantity = Number(Math.max(0, optimisticQuantity - 1).toFixed(0));
   const nextQuantity = Number((optimisticQuantity + 1).toFixed(0));
 
@@ -367,7 +367,7 @@ function CartLineQuantityAdjust({line}: {line: CartLine}) {
         Quantity, {optimisticQuantity}
       </label>
       <div className="flex items-center border rounded">
-        <UpdateCartButton lines={[{id: lineId, quantity: prevQuantity}]}>
+        <UpdateCartButton lines={[{ id: lineId, quantity: prevQuantity }]}>
           <button
             name="decrease-quantity"
             aria-label="Decrease quantity"
@@ -378,7 +378,7 @@ function CartLineQuantityAdjust({line}: {line: CartLine}) {
             <span>&#8722;</span>
             <OptimisticInput
               id={optimisticId}
-              data={{quantity: prevQuantity}}
+              data={{ quantity: prevQuantity }}
             />
           </button>
         </UpdateCartButton>
@@ -387,7 +387,7 @@ function CartLineQuantityAdjust({line}: {line: CartLine}) {
           {optimisticQuantity}
         </div>
 
-        <UpdateCartButton lines={[{id: lineId, quantity: nextQuantity}]}>
+        <UpdateCartButton lines={[{ id: lineId, quantity: nextQuantity }]}>
           <button
             className="w-10 h-10 transition text-primary/50 hover:text-primary"
             name="increase-quantity"
@@ -397,7 +397,7 @@ function CartLineQuantityAdjust({line}: {line: CartLine}) {
             <span>&#43;</span>
             <OptimisticInput
               id={optimisticId}
-              data={{quantity: nextQuantity}}
+              data={{ quantity: nextQuantity }}
             />
           </button>
         </UpdateCartButton>
@@ -457,7 +457,7 @@ export function CartEmpty({
   onClose?: () => void;
 }) {
   const scrollRef = useRef(null);
-  const {y} = useScroll(scrollRef);
+  const { y } = useScroll(scrollRef);
 
   const container = {
     drawer: clsx([
@@ -477,6 +477,13 @@ export function CartEmpty({
       hidden={hidden}
       data-test="cart-empty"
     >
+      {layout === 'page' && (
+        <div className="bg-primary/5 text-primary p-4 mb-6 rounded-md flex items-center justify-center">
+          <Text className="text-center font-medium">
+            Free shipping on orders over $50!
+          </Text>
+        </div>
+      )}
       <section className="grid gap-6">
         <Text format>
           Looks like you haven&rsquo;t added anything yet, let&rsquo;s get you
