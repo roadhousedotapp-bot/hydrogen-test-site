@@ -65,7 +65,7 @@ export function Drawer({
                   <header
                     className={`sticky top-0 flex flex-col items-center px-6 sm:px-8 md:px-12 bg-accent-dark text-contrast py-2`}
                   >
-                    {/* Prettier added hero banner */}
+                    {/* Shipping notice banner */}
                     <div className="w-full text-center">
                       <p className="text-sm font-medium">
                         Free shipping on orders over $50!
