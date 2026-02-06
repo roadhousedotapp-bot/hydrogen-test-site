@@ -77,6 +77,8 @@ export function Drawer({
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           className="w-5 h-5"
+                          role="img"
+                          aria-label="Shipping icon"
                         >
                           <title>Shipping</title>
                           <rect x="1" y="3" width="15" height="13" />
